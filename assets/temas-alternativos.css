@@ -1,0 +1,283 @@
+/* ========================================
+   TEMAS ALTERNATIVOS PARA APP-TAREAS
+   Copia y pega en assets/style.css (sección :root)
+   ======================================== */
+
+/* ====================================
+   🔥 TEMA: ROJO FUEGO
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #612d2d;
+  --primary-gradient-end: #1a0f0f;
+  --accent-blue: #ff4757;
+  --accent-purple: #ff6348;
+  --accent-orange: #ff7675;
+  --accent-green: #10b981;
+  --accent-red: #ee5a6f;
+  --accent-yellow: #feca57;
+  
+  --bg-body: #1a0f0f;
+  --bg-card: #2d1a1a;
+  --bg-card-hover: #3d2424;
+  --bg-input: #3a1f1f;
+  --bg-input-focus: #4a2929;
+  
+  --text-primary: #ffe4e4;
+  --text-secondary: #ffb8b8;
+  --text-muted: #cc8888;
+  
+  --border-color: #5d3030;
+  --shadow-sm: 0 2px 8px rgba(255, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(255, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(255, 0, 0, 0.4);
+  --shadow-glow: 0 0 20px rgba(255, 71, 87, 0.4);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   🌿 TEMA: VERDE NATURALEZA
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #2d6138;
+  --primary-gradient-end: #0f1711;
+  --accent-blue: #10b981;
+  --accent-purple: #34d399;
+  --accent-orange: #84cc16;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-yellow: #facc15;
+  
+  --bg-body: #0f1711;
+  --bg-card: #1a2d22;
+  --bg-card-hover: #24392d;
+  --bg-input: #1f3a28;
+  --bg-input-focus: #2a4a35;
+  
+  --text-primary: #e4ffe4;
+  --text-secondary: #b8ffb8;
+  --text-muted: #88cc88;
+  
+  --border-color: #305d38;
+  --shadow-sm: 0 2px 8px rgba(0, 255, 0, 0.15);
+  --shadow-md: 0 4px 16px rgba(0, 255, 0, 0.25);
+  --shadow-lg: 0 8px 32px rgba(0, 255, 0, 0.35);
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   💜 TEMA: MORADO CYBERPUNK
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #4c2d61;
+  --primary-gradient-end: #13111a;
+  --accent-blue: #a855f7;
+  --accent-purple: #ec4899;
+  --accent-orange: #f472b6;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #fbbf24;
+  
+  --bg-body: #13111a;
+  --bg-card: #1e1829;
+  --bg-card-hover: #2a2038;
+  --bg-input: #2a1f3a;
+  --bg-input-focus: #3a2a4a;
+  
+  --text-primary: #f5e4ff;
+  --text-secondary: #d8b8ff;
+  --text-muted: #b088cc;
+  
+  --border-color: #5d3070;
+  --shadow-sm: 0 2px 8px rgba(168, 85, 247, 0.2);
+  --shadow-md: 0 4px 16px rgba(168, 85, 247, 0.3);
+  --shadow-lg: 0 8px 32px rgba(168, 85, 247, 0.4);
+  --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.5);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   🌅 TEMA: NARANJA SUNSET
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #61452d;
+  --primary-gradient-end: #1a1410;
+  --accent-blue: #ff6b35;
+  --accent-purple: #f7931a;
+  --accent-orange: #ff8c42;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #fbbf24;
+  
+  --bg-body: #1a1410;
+  --bg-card: #2d1f1a;
+  --bg-card-hover: #3d2924;
+  --bg-input: #3a251f;
+  --bg-input-focus: #4a352a;
+  
+  --text-primary: #ffe8e4;
+  --text-secondary: #ffc8b8;
+  --text-muted: #cc9888;
+  
+  --border-color: #5d4030;
+  --shadow-sm: 0 2px 8px rgba(255, 107, 53, 0.2);
+  --shadow-md: 0 4px 16px rgba(255, 107, 53, 0.3);
+  --shadow-lg: 0 8px 32px rgba(255, 107, 53, 0.4);
+  --shadow-glow: 0 0 20px rgba(255, 107, 53, 0.4);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   🌌 TEMA: AZUL GALAXIA
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #2d3d61;
+  --primary-gradient-end: #0f0f1a;
+  --accent-blue: #4f46e5;
+  --accent-purple: #7c3aed;
+  --accent-orange: #818cf8;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #fbbf24;
+  
+  --bg-body: #0f0f1a;
+  --bg-card: #1a1a2d;
+  --bg-card-hover: #24243d;
+  --bg-input: #1f1f3a;
+  --bg-input-focus: #2a2a4a;
+  
+  --text-primary: #e4e4ff;
+  --text-secondary: #b8b8ff;
+  --text-muted: #8888cc;
+  
+  --border-color: #30305d;
+  --shadow-sm: 0 2px 8px rgba(79, 70, 229, 0.2);
+  --shadow-md: 0 4px 16px rgba(79, 70, 229, 0.3);
+  --shadow-lg: 0 8px 32px rgba(79, 70, 229, 0.4);
+  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.4);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   ⚪ TEMA: CLARO / LIGHT MODE
+   ==================================== */
+:root {
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #3b82f6;
+  --primary-gradient-end: #8b5cf6;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --accent-orange: #f97316;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #f59e0b;
+  
+  --bg-body: #f5f5f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f9fafb;
+  --bg-input: #f3f4f6;
+  --bg-input-focus: #e5e7eb;
+  
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  
+  --border-color: #d1d5db;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.2);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+
+/* ====================================
+   ⚫ TEMA: NEGRO ABSOLUTO (AMOLED)
+   ==================================== */
+:root {
+  --primary-dark: #000000;
+  --primary-gradient-start: #1a1a1a;
+  --primary-gradient-end: #000000;
+  --accent-blue: #00d4ff;
+  --accent-purple: #a855f7;
+  --accent-orange: #ff6b35;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #fbbf24;
+  
+  --bg-body: #000000;
+  --bg-card: #0a0a0a;
+  --bg-card-hover: #141414;
+  --bg-input: #1a1a1a;
+  --bg-input-focus: #242424;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  
+  --border-color: #1f1f1f;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 1);
+  --shadow-glow: 0 0 30px rgba(0, 212, 255, 0.5);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}

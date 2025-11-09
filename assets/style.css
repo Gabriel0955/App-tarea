@@ -1,0 +1,1212 @@
+/* ========================================
+   APP-TAREAS - Tema Moderno Personalizable
+   ======================================== */
+
+:root {
+  /* Colores principales - personalízalos aquí */
+  --primary-dark: #1a1d29;
+  --primary-gradient-start: #2d3561;
+  --primary-gradient-end: #1a1d29;
+  --accent-blue: #00d4ff;
+  --accent-purple: #a855f7;
+  --accent-orange: #ff6b35;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-yellow: #fbbf24;
+  
+  /* Fondos y superficies */
+  --bg-body: #0f1117;
+  --bg-card: #1e2139;
+  --bg-card-hover: #252a42;
+  --bg-input: #2a2f48;
+  --bg-input-focus: #353b5a;
+  
+  /* Textos */
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  
+  /* Bordes y sombras */
+  --border-color: #2d3250;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(0, 212, 255, 0.3);
+  
+  /* Espaciado */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 32px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, var(--bg-body) 0%, #1a1d2e 100%);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: var(--spacing-md);
+  background-attachment: fixed;
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Contenedor principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Encabezados */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.5px;
+  animation: slideIn 0.6s ease-out;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--accent-blue);
+  display: inline-block;
+}
+
+/* Barra de acciones superior */
+.top-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+/* Botones mejorados */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--accent-blue), #0099cc);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn.red {
+  background: linear-gradient(135deg, var(--accent-red), #dc2626);
+}
+
+.btn.red:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+button.btn {
+  padding: 12px 32px;
+  font-size: 1rem;
+}
+
+/* Botones con solo íconos - más pequeños */
+.btn-icon {
+  padding: 6px 10px;
+  font-size: 1.1rem;
+  min-width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  transform: scale(1.1);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
+/* Badges con estilo moderno */
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-sm);
+  display: inline-block;
+  white-space: nowrap;
+  min-width: 70px;
+  text-align: center;
+}
+
+.badge.baja {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.badge.media {
+  background: linear-gradient(135deg, var(--accent-yellow), #f59e0b);
+  animation: pulse 2s infinite;
+}
+
+.badge.alta {
+  background: linear-gradient(135deg, var(--accent-red), #dc2626);
+  animation: pulse 1.5s infinite;
+}
+
+/* Tabla mejorada */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: var(--spacing-md) 0;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+thead {
+  background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+}
+
+th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--accent-blue);
+}
+
+td {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: background 0.2s ease;
+}
+
+tbody tr {
+  transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+  background: var(--bg-card-hover);
+  transform: scale(1.01);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Estilos para botones de acciones en desktop */
+td[data-label="Acciones"] {
+  white-space: nowrap;
+}
+
+td[data-label="Acciones"] .btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  margin-right: 6px;
+  margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: auto;
+}
+
+/* Botones de solo íconos más compactos en desktop */
+td[data-label="Acciones"] .btn-icon {
+  padding: 6px 10px;
+  min-width: 36px;
+  font-size: 1rem;
+  margin-right: 4px;
+}
+
+/* Botones con solo emoji más compactos */
+td[data-label="Acciones"] .btn:not(:first-child) {
+  padding: 8px 12px;
+  min-width: 40px;
+}
+
+td .btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+/* Formularios modernos */
+form {
+  background: var(--bg-input);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-top: var(--spacing-md);
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  font-size: 0.95rem;
+}
+
+input[type="text"],
+input[type="date"],
+textarea,
+select {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300d4ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-xs);
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+  flex-shrink: 0; /* Evitar que se comprima */
+}
+
+label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Texto auxiliar */
+.small {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 4px;
+}
+
+/* Mensajes vacíos */
+p.small {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--border-color);
+}
+
+/* ========================================
+   DISEÑO RESPONSIVO COMPLETO
+   ======================================== */
+
+/* Móviles pequeños (hasta 480px) - ENFOQUE EN TAREAS */
+@media (max-width: 480px) {
+  body {
+    padding: 0;
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 8px;
+    border-radius: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+  }
+  
+  /* Header compacto en móvil */
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+    text-align: center;
+  }
+  
+  /* Ocultar subtítulo en móvil para ahorrar espacio */
+  .subtitle,
+  p.subtitle {
+    display: none !important;
+  }
+  
+  h2 {
+    font-size: 1.1rem;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    border-bottom-width: 1px;
+  }
+  
+  /* Barra de acciones compacta y sticky */
+  .top-actions {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-direction: row;
+    align-items: stretch;
+    padding: 8px;
+    gap: 6px;
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  
+  /* Botones más compactos e icónicos */
+  .top-actions .btn {
+    flex: 1;
+    padding: 10px 6px;
+    font-size: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    min-width: 60px;
+  }
+  
+  .top-actions .btn .btn-text {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  
+  .btn {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  
+  /* TARJETAS DE TAREAS - Diseño enfocado y visual */
+  table {
+    display: block;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  thead {
+    display: none;
+  }
+  
+  tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Cada tarea es una tarjeta visual */
+  tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  tr:active {
+    transform: scale(0.98);
+  }
+  
+  tr:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-blue);
+  }
+  
+  /* Marca visual para tareas con urgencia alta */
+  tr:has(.badge.alta):before {
+    background: linear-gradient(180deg, var(--accent-red), var(--accent-orange));
+    width: 6px;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  }
+  
+  tr:has(.badge.media):before {
+    background: linear-gradient(180deg, var(--accent-yellow), var(--accent-orange));
+  }
+  
+  /* Indicador visual para tareas en producción */
+  tr:has(.small:contains("En producción")) {
+    opacity: 0.75;
+    border-color: var(--accent-green);
+  }
+  
+  tr:has(.small:contains("En producción")):before {
+    background: var(--accent-green);
+  }
+  
+  /* Layout de contenido de tarjeta */
+  td {
+    display: block;
+    padding: 0;
+    border: none;
+    margin-bottom: 10px;
+  }
+  
+  td:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Título de la tarea - destacado */
+  td[data-label="Tarea"],
+  td[data-label="Título"] {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+  }
+  
+  td[data-label="Tarea"] strong,
+  td[data-label="Título"] strong {
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+  
+  td[data-label="Tarea"] .small,
+  td[data-label="Título"] .small {
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-muted);
+  }
+  
+  /* Checkboxes compactos en móvil */
+  td[data-label="Tarea"] input[type="checkbox"],
+  td[data-label="Título"] input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+  }
+  
+  td[data-label="Tarea"] label,
+  td[data-label="Título"] label {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    margin: 0;
+  }
+  
+  /* Badge de urgencia y estado - compacto */
+  td[data-label="Urgencia"],
+  td[data-label="⚡"],
+  td[data-label="⚡ Estado"] {
+    margin-bottom: 8px;
+  }
+  
+  td[data-label="Urgencia"] .badge,
+  td[data-label="⚡"] .badge,
+  td[data-label="⚡ Estado"] .badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    min-width: auto;
+    display: inline-block;
+  }
+  
+  /* Descripción */
+  td[data-label="Para tener en cuenta"] {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    padding: 10px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-blue);
+  }
+  
+  /* Fecha límite compacta */
+  td[data-label="Fecha límite"],
+  td[data-label="📅 Vence"] {
+    display: inline-block;
+    width: auto;
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+  }
+  
+  /* Acciones en tarjeta */
+  td[data-label="Acciones"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  td[data-label="Acciones"] .btn {
+    flex: 1 1 auto;
+    min-width: 44px; /* Tamaño mínimo táctil recomendado */
+    padding: 12px 10px;
+    font-size: 1.2rem; /* Íconos más grandes */
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    text-align: center;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Botones de íconos en móvil - más compactos */
+  td[data-label="Acciones"] .btn-icon {
+    flex: 0 0 auto;
+    min-width: 44px;
+    max-width: 44px;
+    padding: 10px;
+    font-size: 1.1rem;
+  }
+  
+  /* Botón de producción/docs ocupa más espacio */
+  td[data-label="Acciones"] .btn:first-child {
+    flex: 2 1 auto;
+    min-width: 100px;
+    font-size: 0.85rem;
+  }
+  
+  td[data-label="Acciones"] .btn:active {
+    transform: scale(0.97);
+  }
+  
+  /* Ocultar labels en móvil (ya que el diseño es visual) */
+  td:before {
+    display: none;
+  }
+  
+  /* Resaltar tareas en producción */
+  tr:has(.badge:contains("Prod")) {
+    opacity: 0.85;
+  }
+  
+  tr:has(.badge:contains("Prod")):before {
+    background: var(--accent-green) !important;
+  }
+  
+  td .btn {
+    display: inline-block;
+    width: auto;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  /* Formularios en móvil - enfocados y directos */
+  form {
+    padding: 16px;
+    margin-top: 16px;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+  }
+  
+  label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: var(--accent-blue);
+  }
+  
+  input[type="text"],
+  input[type="date"],
+  textarea,
+  select {
+    padding: 14px;
+    font-size: 16px; /* Evita zoom en iOS */
+    border-width: 2px;
+  }
+  
+  textarea {
+    min-height: 100px;
+  }
+  
+  button.btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  
+  form .btn.red {
+    width: 100%;
+    padding: 14px;
+  }
+  
+  /* Contador de tareas visible en móvil */
+  h2:after {
+    content: ' (' attr(data-count) ')';
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+  
+  /* Mensaje sin tareas más visual */
+  p.small {
+    padding: 40px 20px;
+    font-size: 1rem;
+    border-width: 3px;
+  }
+  
+  /* Botón flotante para crear tarea en móvil */
+  .fab-mobile {
+    display: flex !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    font-size: 2rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.6);
+    z-index: 999;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .fab-mobile:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 10px rgba(0, 212, 255, 0.4);
+  }
+  
+  /* Ocultar el botón "Nueva" de la barra superior en móvil pequeño */
+  .top-actions button[onclick="openModal()"] {
+    display: none;
+  }
+}
+
+/* Móviles medianos y grandes (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  body {
+    padding: 4px;
+    font-size: 15px;
+  }
+  
+  .container {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
+  }
+  
+  .subtitle,
+  p.subtitle {
+    font-size: 0.9rem !important;
+    display: block !important;
+  }
+  
+  /* Barra superior sticky también en tablets pequeños */
+  .top-actions {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 8px;
+    background: var(--bg-card);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  
+  .top-actions .btn {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .top-actions .btn .btn-text {
+    display: inline;
+  }
+  
+  /* Mostrar FAB también en este tamaño */
+  .fab-mobile {
+    display: block !important;
+    bottom: 16px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    font-size: 1.8rem;
+  }
+  
+  .top-actions .btn[href="#add"] {
+    display: none;
+  }
+  
+  /* Tabla scrollable horizontal */
+  table {
+    display: table;
+    font-size: 0.9rem;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  thead, tbody, tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  th, td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+  
+  th {
+    font-size: 0.8rem;
+  }
+  
+  /* Botones de acciones más compactos en tablet */
+  td[data-label="Acciones"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  td[data-label="Acciones"] .btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    margin: 0;
+    flex: 0 1 auto;
+    white-space: nowrap;
+  }
+  
+  /* Botones de íconos aún más pequeños en tablet */
+  td[data-label="Acciones"] .btn-icon {
+    padding: 6px 8px;
+    min-width: 36px;
+    font-size: 0.95rem;
+  }
+  
+  /* Botones con solo íconos más pequeños */
+  td[data-label="Acciones"] .btn:not(:first-child) {
+    padding: 8px 10px;
+    min-width: 40px;
+  }
+  
+  /* Formularios */
+  form {
+    padding: 20px;
+  }
+  
+  input[type="text"],
+  input[type="date"],
+  textarea,
+  select {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+  
+  button.btn {
+    padding: 12px 24px;
+  }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    max-width: 95%;
+    padding: 28px;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  .top-actions {
+    padding: 18px;
+    gap: 12px;
+  }
+  
+  .top-actions .btn {
+    flex: 0 1 auto;
+  }
+  
+  table {
+    font-size: 0.95rem;
+  }
+  
+  th, td {
+    padding: 14px 12px;
+  }
+}
+
+/* Pantallas grandes (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .container {
+    max-width: 1100px;
+  }
+  
+  h1 {
+    font-size: 2.4rem;
+  }
+}
+
+/* Pantallas extra grandes (1441px+) */
+@media (min-width: 1441px) {
+  .container {
+    max-width: 1400px;
+    padding: 40px;
+  }
+  
+  h1 {
+    font-size: 2.8rem;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  .top-actions {
+    padding: 24px;
+  }
+  
+  table {
+    font-size: 1.05rem;
+  }
+  
+  th, td {
+    padding: 18px 14px;
+  }
+}
+
+/* Orientación landscape en móviles */
+@media (max-height: 500px) and (orientation: landscape) {
+  body {
+    padding: 8px;
+  }
+  
+  .container {
+    padding: 16px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  h2 {
+    font-size: 1.2rem;
+    margin-top: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .top-actions {
+    padding: 12px;
+  }
+  
+  form {
+    padding: 16px;
+  }
+  
+  textarea {
+    min-height: 80px;
+  }
+}
+
+/* Accesibilidad - preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Impresión */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .top-actions,
+  .btn,
+  button {
+    display: none;
+  }
+  
+  table {
+    page-break-inside: avoid;
+  }
+  
+  tr {
+    page-break-inside: avoid;
+  }
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar personalizado (Chrome/Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-body);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-blue);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-purple);
+}
+
+/* ========================================
+   MODAL STYLES
+   ======================================== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: linear-gradient(145deg, var(--bg-card), var(--primary-dark));
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  animation: slideDown 0.3s ease;
+  position: relative;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
+  border-bottom: 2px solid var(--accent-blue);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.modal-header h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+  font-size: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  transform: rotate(90deg);
+}
+
+.modal-content form {
+  padding: var(--spacing-md);
+}
+
+/* Responsive modal */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-height: 85vh;
+    margin: 10px;
+  }
+  
+  .modal-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .modal-close {
+    width: 35px;
+    height: 35px;
+    font-size: 1.5rem;
+  }
+}
+
