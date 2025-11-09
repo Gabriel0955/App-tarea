@@ -24,7 +24,7 @@ DB_HOST=tu-servidor.mysql.database.azure.com- 🔄 **Adaptación inteligente seg
 
 DB_NAME=tasks_app- ⚡ **Animaciones sutiles y transiciones suaves**
 
-DB_USER=tu-usuario- 🌈 **8 temas predefinidos incluidos**
+DB_USER=tu-usuario- **8 temas predefinidos incluidos**
 
 DB_PASS=tu-contraseña- ♿ **Accesible y optimizado para touch**
 
@@ -149,9 +149,3 @@ Azure App Service leerá esas variables con getenv() en PHP.
 - 📊 Dashboard con estadísticas
 - 🏷️ Sistema de etiquetas/categorías
 - 🔍 Búsqueda y filtros avanzados
-
----
-
-Hecho con ❤️ para desarrolladores que quieren gestionar sus tareas con estilo.
-
-**¿Te gusta el diseño?** Personalízalo con tu propio tema siguiendo la [Guía de Personalización](PERSONALIZACION.md).
