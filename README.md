@@ -1,32 +1,140 @@
-# App-Tareas# App-Tareas (PHP + MySQL)
+# App-Tareas
 
+Sistema profesional de gestión y seguimiento de tareas con documentación obligatoria.
 
+## ✨ Características
 
-Sistema profesional de gestión y seguimiento de tareas con documentación obligatoria.Aplicación moderna y profesional para registrar tareas, indicar su urgencia y notas "lo que debo tener en cuenta". Incluye una marca para saber si la tarea ya fue pasada a producción (deployed).
+- 🔐 **Sistema de autenticación** - Registro e inicio de sesión seguro
+- 👤 **Usuarios independientes** - Cada usuario ve solo sus tareas
+- ✅ Gestión completa de tareas (crear, editar, eliminar)
+- 📋 Documentos obligatorios antes de producción (4 documentos)
+- ⚡ Niveles de urgencia (Alta, Media, Baja)
+- 🎯 Estado: Pendiente / En Producción
+- 🎨 8 temas personalizables
+- 📱 Diseño 100% responsive
+- 🔄 Actualización en tiempo real de documentos
+- 🌙 Tema oscuro moderno con degradados
+- 🔒 Contraseñas encriptadas con bcrypt
 
+## 🚀 Despliegue en Azure desde GitLab
 
+### 1. Crear Recursos en Azure
 
-## Despliegue en Azure desde GitLab## ✨ Características
+#### Base de Datos MySQL
+1. En Azure Portal, crear **Azure Database for MySQL - Servidor flexible**
+2. Configuración:
+   - Nombre: `app-tareas-db`
+   - Usuario admin: tu usuario
+   - Contraseña: tu contraseña segura
+   - Permitir acceso público desde servicios de Azure
 
+#### App Service
+1. Crear **App Service**
+2. Configuración:
+   - Runtime: **PHP 8.2**
+   - Sistema operativo: **Linux**
+   - Plan: F1 (gratis) o B1 (producción)
 
+### 2. Configurar Variables de Entorno
 
-### Variables de Entorno en Azure- ✅ Añadir, editar, eliminar tareas
+En **App Service → Configuración → Configuración de la aplicación**, agregar:
 
-- 🎯 Marcar tareas como "en producción"
+```
+DB_HOST=app-tareas-db.mysql.database.azure.com
+DB_NAME=tasks_app
+DB_USER=tu_usuario
+DB_PASS=tu_contraseña
+```
+DB_HOST=app-tareas-db.mysql.database.azure.com
+DB_NAME=tasks_app
+DB_USER=tu_usuario
+DB_PASS=tu_contraseña
+DB_PORT=3306
+APP_DEBUG=false
+```
 
-Configurar en **App Service → Configuración → Configuración de la aplicación**:- 🔍 Filtrar tareas pendientes de pasar a producción
+### 3. Conectar GitLab con Azure
 
-- 🎨 **Diseño moderno con tema oscuro personalizable**
+1. En **App Service → Centro de implementación**
+2. Seleccionar **GitLab**
+3. Autorizar y conectar tu cuenta
+4. Seleccionar:
+   - Repositorio: tu repositorio
+   - Rama: `master` o `main`
+5. Guardar
 
-```- 📱 **100% Responsive - perfecto en móviles, tablets y desktop**
+Azure desplegará automáticamente cada vez que hagas push.
 
-DB_HOST=tu-servidor.mysql.database.azure.com- 🔄 **Adaptación inteligente según tamaño de pantalla**
+### 4. Ejecutar Script SQL
 
-DB_NAME=tasks_app- ⚡ **Animaciones sutiles y transiciones suaves**
+Después del primer despliegue, ejecutar:
 
-DB_USER=tu-usuario- **8 temas predefinidos incluidos**
+```bash
+mysql -h app-tareas-db.mysql.database.azure.com -u tu_usuario -p tasks_app < db/schema.sql
+```
 
-DB_PASS=tu-contraseña- ♿ **Accesible y optimizado para touch**
+O copiar y pegar el contenido de `db/schema.sql` en Azure Data Studio.
+
+## 🛠️ Desarrollo Local
+
+### Requisitos
+- WAMP/XAMPP/MAMP (Apache + PHP 7.4+ + MySQL)
+- PHP 7.4 o superior
+- MySQL 5.7 o superior
+
+### Instalación
+1. Clonar el repositorio en `htdocs` o `www`
+2. Crear base de datos:
+   ```sql
+   CREATE DATABASE tasks_app;
+   ```
+3. Importar estructura:
+   ```bash
+   mysql -u root -p tasks_app < db/schema.sql
+   ```
+4. Configurar `config.php` (ya configurado para localhost)
+5. Acceder: `http://localhost/App-Tareas/public/`
+
+## 📱 Temas Disponibles
+
+Visita `/public/temas.php` para ver los 8 temas:
+- 🌊 Ocean (por defecto)
+- 🔥 Fire
+- 🌿 Nature
+- 💜 Cyberpunk
+- 🌅 Sunset
+- 🌌 Galaxy
+- ☀️ Light
+- ⚫ AMOLED Black
+
+## 📋 Documentos Obligatorios
+
+Cuando una tarea requiere documentación:
+1. Plan de Prueba Interna
+2. Plan Puesta en Producción
+3. Control de Objeto
+4. Política de Respaldo
+
+Los 4 documentos deben completarse antes de marcar como "En Producción".
+
+## 🔒 Seguridad
+
+- Headers de seguridad configurados
+- Variables de entorno para credenciales
+- Validación de datos en servidor
+- Protección XSS y SQL Injection (PDO preparadas)
+
+## 📞 Soporte
+
+Problemas comunes resueltos en el código:
+- ✅ Rutas relativas (funcionan en subdirectorios)
+- ✅ Compatible con IIS (Azure) y Apache
+- ✅ Variables de entorno configurables
+- ✅ Responsive en todos los dispositivos
+
+---
+
+Desarrollado con ❤️ | PHP + MySQL + CSS3
 
 DB_PORT=3306
 
@@ -149,3 +257,9 @@ Azure App Service leerá esas variables con getenv() en PHP.
 - 📊 Dashboard con estadísticas
 - 🏷️ Sistema de etiquetas/categorías
 - 🔍 Búsqueda y filtros avanzados
+
+---
+
+Hecho con ❤️ para desarrolladores que quieren gestionar sus tareas con estilo.
+
+**¿Te gusta el diseño?** Personalízalo con tu propio tema siguiendo la [Guía de Personalización](PERSONALIZACION.md).

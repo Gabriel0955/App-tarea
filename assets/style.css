@@ -331,6 +331,8 @@ label {
 }
 
 input[type="text"],
+input[type="email"],
+input[type="password"],
 input[type="date"],
 textarea,
 select {
@@ -348,6 +350,8 @@ select {
 }
 
 input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
 input[type="date"]:focus,
 textarea:focus,
 select:focus {
@@ -724,6 +728,8 @@ p.small {
   }
   
   input[type="text"],
+  input[type="email"],
+  input[type="password"],
   input[type="date"],
   textarea,
   select {
@@ -923,6 +929,8 @@ p.small {
   }
   
   input[type="text"],
+  input[type="email"],
+  input[type="password"],
   input[type="date"],
   textarea,
   select {

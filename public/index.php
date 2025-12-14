@@ -1,19 +1,25 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../src/auth.php';
 
 $pdo = get_pdo();
+$user_id = get_current_user_id();
+$username = get_current_username();
 
 $filter = $_GET['filter'] ?? '';
 if ($filter === 'pending') {
-    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE deployed = 0 ORDER BY created_at DESC');
+    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE user_id = ? AND deployed = 0 ORDER BY created_at DESC');
+    $stmt->execute([$user_id]);
 } else {
-    $stmt = $pdo->prepare('SELECT * FROM tasks ORDER BY created_at DESC');
+    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC');
+    $stmt->execute([$user_id]);
 }
-$stmt->execute();
 $tasks = $stmt->fetchAll();
 
-function esc($s) { return htmlspecialchars($s, ENT_QUOTES); }
+function esc($s) { 
+  return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 
+}
 
 ?>
 <!doctype html>
@@ -30,10 +36,17 @@ function esc($s) { return htmlspecialchars($s, ENT_QUOTES); }
 </head>
 <body>
 <div class="container">
-  <h1>⚡ App-Tareas</h1>
-  <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem; margin-top: -12px; margin-bottom: 24px; font-weight: 400;">
-    Sistema profesional de gestión y seguimiento de tareas
-  </p>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+    <div>
+      <h1>⚡ App-Tareas</h1>
+      <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem; margin-top: -12px; margin-bottom: 0; font-weight: 400;">
+        Bienvenido, <strong style="color: var(--accent-blue);"><?= esc($username) ?></strong>
+      </p>
+    </div>
+    <a class="btn red" href="logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
+      🚪 Salir
+    </a>
+  </div>
 
   <div class="top-actions">
     <a class="btn" href="index.php" title="Ver todas las tareas">
@@ -48,10 +61,6 @@ function esc($s) { return htmlspecialchars($s, ENT_QUOTES); }
       <span style="font-size: 1.2rem;">➕</span>
       <span class="btn-text">Nueva</span>
     </button>
-    <a class="btn" href="temas.php" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));" title="Cambiar tema">
-      <span style="font-size: 1.2rem;">🎨</span>
-      <span class="btn-text">Temas</span>
-    </a>
   </div>
 
   <?php if (count($tasks) === 0): ?>

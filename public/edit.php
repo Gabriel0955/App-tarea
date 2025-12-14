@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../src/auth.php';
 
 $pdo = get_pdo();
+$user_id = get_current_user_id();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
@@ -23,20 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: index.php?error=empty'); exit;
     }
 
-    $stmt = $pdo->prepare('UPDATE tasks SET title = ?, description = ?, urgency = ?, due_date = ?, deployed = ?, requires_docs = ?, doc_plan_prueba = ?, doc_plan_produccion = ?, doc_control_objeto = ?, doc_politica_respaldo = ? WHERE id = ?');
-    $stmt->execute([$title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo, $id]);
+    $stmt = $pdo->prepare('UPDATE tasks SET title = ?, description = ?, urgency = ?, due_date = ?, deployed = ?, requires_docs = ?, doc_plan_prueba = ?, doc_plan_produccion = ?, doc_control_objeto = ?, doc_politica_respaldo = ? WHERE id = ? AND user_id = ?');
+    $stmt->execute([$title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo, $id, $user_id]);
   header('Location: index.php'); exit;
 }
 
 $id = intval($_GET['id'] ?? 0);
 if ($id <= 0) { header('Location: index.php'); exit; }
 
-$stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ?');
-$stmt->execute([$id]);
+$stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?');
+$stmt->execute([$id, $user_id]);
 $task = $stmt->fetch();
 if (!$task) { header('Location: index.php'); exit; }
 
-function esc($s) { return htmlspecialchars($s, ENT_QUOTES); }
+function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
 
 ?>
 <!doctype html>

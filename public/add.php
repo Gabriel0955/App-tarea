@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php'); exit;
 }
 
+$user_id = get_current_user_id();
 $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $urgency = $_POST['urgency'] ?? 'Media';
@@ -24,7 +26,7 @@ if ($title === '') {
 }
 
 $pdo = get_pdo();
-$stmt = $pdo->prepare('INSERT INTO tasks (title, description, urgency, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-$stmt->execute([$title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo]);
+$stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+$stmt->execute([$user_id, $title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo]);
 
 header('Location: index.php'); exit;
