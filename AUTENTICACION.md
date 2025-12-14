@@ -23,36 +23,42 @@
    - Validación de sesión en todas las páginas
    - Filtrado por user_id en TODAS las queries
 
-## 🚀 Cómo usar (WAMP Local)
+## 🚀 Cómo usar (Local con PostgreSQL)
 
 ### Primera vez (base de datos nueva)
 
 ```bash
 # 1. Ejecutar schema actualizado
-mysql -u root < db/schema.sql
+psql -U postgres -d postgres -f db/schema.sql
 
-# 2. Abrir navegador
-http://localhost/App-Tareas/public/register.php
+# 2. Iniciar servidor PHP
+php -S localhost:8000 -t public
 
-# 3. Crear tu cuenta
-# 4. ¡Listo! Ya puedes usar la app
+# 3. Abrir navegador
+http://localhost:8000/register.php
+
+# 4. Crear tu cuenta
+# 5. ¡Listo! Ya puedes usar la app
 ```
 
 ### Si YA tienes tareas existentes
 
 ```bash
 # 1. Ejecutar schema actualizado
-mysql -u root < db/schema.sql
+psql -U postgres -d tasks_app -f db/schema.sql
 
 # 2. Migrar tareas existentes al usuario admin
-mysql -u root < db/migrate_existing_tasks.sql
+psql -U postgres -d tasks_app -f db/migrate_existing_tasks.sql
 
-# 3. Iniciar sesión
-http://localhost/App-Tareas/public/login.php
+# 3. Iniciar servidor y abrir navegador
+php -S localhost:8000 -t public
+
+# 4. Iniciar sesión
+http://localhost:8000/login.php
 Usuario: admin
 Contraseña: admin123
 
-# 4. ¡IMPORTANTE! Cambia la contraseña del admin inmediatamente
+# 5. ¡IMPORTANTE! Cambia la contraseña del admin inmediatamente
 ```
 
 ## 🔑 Flujo de usuario
@@ -94,20 +100,19 @@ Contraseña: admin123
 
 ### Variables de entorno (agregar en Azure App Service)
 
-Las mismas que antes, NO necesitas agregar nada nuevo:
 ```
-DB_HOST=...
+DB_HOST=app-tareas-db.postgres.database.azure.com
 DB_NAME=tasks_app
-DB_USER=...
-DB_PASS=...
-DB_PORT=3306
+DB_USER=adminuser
+DB_PASS=tu_contraseña
+DB_PORT=5432
 APP_DEBUG=false
 ```
 
 ### Después del deploy en Azure:
 
-1. Conectarte a la base de datos MySQL
-2. Ejecutar `db/schema.sql`
+1. Conectarte a la base de datos PostgreSQL
+2. Ejecutar `db/schema.sql` con psql o pgAdmin
 3. Crear tu primer usuario en `/public/register.php`
 4. ¡Listo!
 

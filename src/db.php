@@ -1,5 +1,5 @@
 <?php
-// src/db.php - Conexión PDO reutilizable
+// src/db.php - Conexión PDO a PostgreSQL
 require_once __DIR__ . '/../config.php';
 
 function get_pdo()
@@ -15,7 +15,7 @@ function get_pdo()
     $pass = DB_PASS;
     $port = DB_PORT;
 
-    $dsn = "mysql:host={$host};port={$port};dbname={$db};charset=utf8mb4";
+    $dsn = "pgsql:host={$host};port={$port};dbname={$db};options='--client_encoding=UTF8'";
 
     try {
         $pdo = new PDO($dsn, $user, $pass, [

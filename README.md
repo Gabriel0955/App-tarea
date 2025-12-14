@@ -20,13 +20,15 @@ Sistema profesional de gestión y seguimiento de tareas con documentación oblig
 
 ### 1. Crear Recursos en Azure
 
-#### Base de Datos MySQL
-1. En Azure Portal, crear **Azure Database for MySQL - Servidor flexible**
+#### Base de Datos PostgreSQL
+1. En Azure Portal, crear **Azure Database for PostgreSQL - Servidor flexible**
 2. Configuración:
    - Nombre: `app-tareas-db`
-   - Usuario admin: tu usuario
+   - Usuario admin: tu usuario (ej: `adminuser`)
    - Contraseña: tu contraseña segura
+   - PostgreSQL version: 14 o superior
    - Permitir acceso público desde servicios de Azure
+   - En **Redes**: Agregar regla de firewall para tu IP
 
 #### App Service
 1. Crear **App Service**
@@ -40,16 +42,11 @@ Sistema profesional de gestión y seguimiento de tareas con documentación oblig
 En **App Service → Configuración → Configuración de la aplicación**, agregar:
 
 ```
-DB_HOST=app-tareas-db.mysql.database.azure.com
+DB_HOST=app-tareas-db.postgres.database.azure.com
 DB_NAME=tasks_app
-DB_USER=tu_usuario
+DB_USER=adminuser
 DB_PASS=tu_contraseña
-```
-DB_HOST=app-tareas-db.mysql.database.azure.com
-DB_NAME=tasks_app
-DB_USER=tu_usuario
-DB_PASS=tu_contraseña
-DB_PORT=3306
+DB_PORT=5432
 APP_DEBUG=false
 ```
 
@@ -65,35 +62,83 @@ APP_DEBUG=false
 
 Azure desplegará automáticamente cada vez que hagas push.
 
-### 4. Ejecutar Script SQL
+### 4. ⚠️ IMPORTANTE: Crear Base de Datos (OBLIGATORIO)
 
-Después del primer despliegue, ejecutar:
+**La base de datos NO se crea automáticamente**. Debes ejecutar el script SQL manualmente:
 
+#### Opción A: Desde tu máquina local (psql)
 ```bash
-mysql -h app-tareas-db.mysql.database.azure.com -u tu_usuario -p tasks_app < db/schema.sql
+psql -h app-tareas-db.postgres.database.azure.com -U adminuser -d postgres -f db/schema.sql
 ```
 
-O copiar y pegar el contenido de `db/schema.sql` en Azure Data Studio.
+#### Opción B: pgAdmin / Azure Data Studio
+1. Conectar a tu servidor PostgreSQL de Azure
+2. Crear base de datos `tasks_app` (si no existe)
+3. Abrir el archivo `db/schema.sql`
+4. Ejecutar el script completo
+
+#### Opción C: Azure Cloud Shell
+1. Ir a **Azure Portal → Cloud Shell** (icono `>_` arriba a la derecha)
+2. Subir el archivo `schema.sql`
+3. Ejecutar:
+```bash
+psql -h app-tareas-db.postgres.database.azure.com -U adminuser -d postgres -f schema.sql
+```
+
+**Esto creará:**
+- Base de datos `tasks_app`
+- Tabla `users` (para login)
+- Tabla `tasks` (tareas vinculadas a usuarios)
+- Índices y foreign keys
+
+### 5. Crear tu primer usuario
+
+1. Abre tu app en Azure: `https://tu-app.azurewebsites.net`
+2. Te redirigirá a `/public/login.php`
+3. Click en "Crear cuenta nueva"
+4. Regístrate con tu usuario y contraseña
+5. ¡Listo! Ya puedes usar la app
 
 ## 🛠️ Desarrollo Local
 
 ### Requisitos
-- WAMP/XAMPP/MAMP (Apache + PHP 7.4+ + MySQL)
 - PHP 7.4 o superior
-- MySQL 5.7 o superior
+- PostgreSQL 12 o superior
+- Apache/Nginx (opcional, puede usar servidor PHP integrado)
 
 ### Instalación
-1. Clonar el repositorio en `htdocs` o `www`
+
+#### Opción 1: Con PostgreSQL instalado localmente
+1. Clonar el repositorio
 2. Crear base de datos:
-   ```sql
+   ```bash
+   psql -U postgres
    CREATE DATABASE tasks_app;
+   \q
    ```
 3. Importar estructura:
    ```bash
-   mysql -u root -p tasks_app < db/schema.sql
+   psql -U postgres -d tasks_app -f db/schema.sql
    ```
-4. Configurar `config.php` (ya configurado para localhost)
-5. Acceder: `http://localhost/App-Tareas/public/`
+4. Configurar `config.php`:
+   ```php
+   DB_HOST=localhost
+   DB_USER=postgres
+   DB_PASS=tu_password
+   DB_PORT=5432
+   ```
+5. Iniciar servidor:
+   ```bash
+   php -S localhost:8000 -t public
+   ```
+6. Acceder: `http://localhost:8000`
+
+#### Opción 2: Con Docker (PostgreSQL en contenedor)
+```bash
+docker run --name postgres-tasks -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:14
+psql -h localhost -U postgres -d postgres -f db/schema.sql
+php -S localhost:8000 -t public
+```
 
 ## 📱 Temas Disponibles
 

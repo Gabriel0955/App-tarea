@@ -1,12 +1,12 @@
 <?php
-// Configuración de base de datos
+// Configuración de base de datos PostgreSQL
 // En Azure, estas variables se configuran en "Configuración de la aplicación"
 
-define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
-define('DB_NAME', getenv('DB_NAME') ?: 'tasks_app');
-define('DB_USER', getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('DB_PASS') ?: 'root');
-define('DB_PORT', getenv('DB_PORT') ?: 3306);
+define('DB_HOST', 'apptarea.postgres.database.azure.com');
+define('DB_NAME', 'postgres');
+define('DB_USER', 'apptarea');
+define('DB_PASS', 'Gabriel1405');
+define('DB_PORT',  5432);
 
 // Modo debug (desactivar en producción)
 define('APP_DEBUG', getenv('APP_DEBUG') ?: false);
