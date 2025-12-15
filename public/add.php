@@ -11,6 +11,8 @@ $user_id = get_current_user_id();
 $title = trim($_POST['title'] ?? '');
 $description = trim($_POST['description'] ?? '');
 $urgency = $_POST['urgency'] ?? 'Media';
+$priority = $_POST['priority'] ?? 'Medio';
+$category = $_POST['category'] ?? 'Otro';
 $due = $_POST['due_date'] ?: null;
 $deployed = isset($_POST['deployed']) && $_POST['deployed'] == '1' ? 1 : 0;
 
@@ -26,7 +28,7 @@ if ($title === '') {
 }
 
 $pdo = get_pdo();
-$stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-$stmt->execute([$user_id, $title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo]);
+$stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, priority, category, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+$stmt->execute([$user_id, $title, $description, $urgency, $priority, $category, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo]);
 
 header('Location: index.php'); exit;

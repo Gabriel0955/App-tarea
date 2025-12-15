@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $description = trim($_POST['description'] ?? '');
     $urgency = $_POST['urgency'] ?? 'Media';
+    $priority = $_POST['priority'] ?? 'Medio';
+    $category = $_POST['category'] ?? 'Otro';
     $due = $_POST['due_date'] ?: null;
     $deployed = isset($_POST['deployed']) && $_POST['deployed'] == '1' ? 1 : 0;
     
@@ -22,12 +24,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $doc_politica_respaldo = isset($_POST['doc_politica_respaldo']) ? 1 : 0;
 
     if ($title === '') {
-    header('Location: index.php?error=empty'); exit;
+        header('Location: index.php?error=empty'); exit;
     }
 
-    $stmt = $pdo->prepare('UPDATE tasks SET title = ?, description = ?, urgency = ?, due_date = ?, deployed = ?, requires_docs = ?, doc_plan_prueba = ?, doc_plan_produccion = ?, doc_control_objeto = ?, doc_politica_respaldo = ? WHERE id = ? AND user_id = ?');
-    $stmt->execute([$title, $description, $urgency, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo, $id, $user_id]);
-  header('Location: index.php'); exit;
+    // Obtener valores anteriores para el historial
+    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?');
+    $stmt->execute([$id, $user_id]);
+    $old_task = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Actualizar tarea
+    $stmt = $pdo->prepare('UPDATE tasks SET title = ?, description = ?, urgency = ?, priority = ?, category = ?, due_date = ?, deployed = ?, requires_docs = ?, doc_plan_prueba = ?, doc_plan_produccion = ?, doc_control_objeto = ?, doc_politica_respaldo = ? WHERE id = ? AND user_id = ?');
+    $stmt->execute([$title, $description, $urgency, $priority, $category, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo, $id, $user_id]);
+    
+    // Registrar en historial si hubo cambios
+    $changes = [];
+    if ($old_task['title'] !== $title) $changes['title'] = ['old' => $old_task['title'], 'new' => $title];
+    if ($old_task['description'] !== $description) $changes['description'] = ['old' => $old_task['description'], 'new' => $description];
+    if ($old_task['urgency'] !== $urgency) $changes['urgency'] = ['old' => $old_task['urgency'], 'new' => $urgency];
+    if ($old_task['priority'] !== $priority) $changes['priority'] = ['old' => $old_task['priority'], 'new' => $priority];
+    if ($old_task['category'] !== $category) $changes['category'] = ['old' => $old_task['category'], 'new' => $category];
+    if ($old_task['deployed'] != $deployed) $changes['deployed'] = ['old' => $old_task['deployed'], 'new' => $deployed];
+    
+    if (!empty($changes)) {
+        $stmt = $pdo->prepare('INSERT INTO task_history (task_id, user_id, action, old_values, new_values) VALUES (?, ?, ?, ?, ?)');
+        $stmt->execute([$id, $user_id, 'updated', json_encode($old_task), json_encode($changes)]);
+    }
+    
+    header('Location: index.php'); exit;
 }
 
 $id = intval($_GET['id'] ?? 0);
@@ -66,7 +89,12 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
 </head>
 <body>
 <div class="container">
-  <h1>✏️ Editar tarea</h1>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+    <h1 style="margin: 0;">✏️ Editar tarea</h1>
+    <a class="btn" href="history.php?id=<?= $task['id'] ?>" style="background: var(--accent-purple);" title="Ver historial de cambios">
+      📜 Historial
+    </a>
+  </div>
   
   <?php if (isset($_GET['error']) && $_GET['error'] === 'docs_incompletos'): ?>
     <div style="background: var(--accent-red); color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; font-size: 0.95rem;">
@@ -78,14 +106,40 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
     <input type="hidden" name="id" value="<?= esc($task['id']) ?>">
     <label>Título de la tarea</label>
     <input type="text" name="title" value="<?= esc($task['title']) ?>" required>
+    
     <label>Descripción</label>
     <textarea name="description" rows="3"><?= esc($task['description']) ?></textarea>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div>
+        <label>🏷️ Categoría</label>
+        <select name="category">
+          <option value="Otro" <?= $task['category']==='Otro' ? 'selected' : '' ?>>Otro</option>
+          <option value="Frontend" <?= $task['category']==='Frontend' ? 'selected' : '' ?>>Frontend</option>
+          <option value="Backend" <?= $task['category']==='Backend' ? 'selected' : '' ?>>Backend</option>
+          <option value="Database" <?= $task['category']==='Database' ? 'selected' : '' ?>>Database</option>
+          <option value="Hotfix" <?= $task['category']==='Hotfix' ? 'selected' : '' ?>>Hotfix</option>
+          <option value="Feature" <?= $task['category']==='Feature' ? 'selected' : '' ?>>Feature</option>
+        </select>
+      </div>
+      <div>
+        <label>⚡ Prioridad</label>
+        <select name="priority">
+          <option value="Bajo" <?= $task['priority']==='Bajo' ? 'selected' : '' ?>>🟢 Bajo</option>
+          <option value="Medio" <?= $task['priority']==='Medio' ? 'selected' : '' ?>>🟡 Medio</option>
+          <option value="Alto" <?= $task['priority']==='Alto' ? 'selected' : '' ?>>🟠 Alto</option>
+          <option value="Crítico" <?= $task['priority']==='Crítico' ? 'selected' : '' ?>>🔴 Crítico</option>
+        </select>
+      </div>
+    </div>
+    
     <label>⚡ Urgencia</label>
     <select name="urgency">
       <option value="Baja" <?= $task['urgency']==='Baja' ? 'selected' : '' ?>>Baja</option>
       <option value="Media" <?= $task['urgency']==='Media' ? 'selected' : '' ?>>Media</option>
       <option value="Alta" <?= $task['urgency']==='Alta' ? 'selected' : '' ?>>Alta</option>
     </select>
+    
     <label>📅 Fecha límite (opcional)</label>
     <input type="date" name="due_date" value="<?= esc($task['due_date']) ?>">
     

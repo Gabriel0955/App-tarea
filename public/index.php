@@ -7,14 +7,60 @@ $pdo = get_pdo();
 $user_id = get_current_user_id();
 $username = get_current_username();
 
+// Estadísticas del dashboard
+$stats_stmt = $pdo->prepare("
+    SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN deployed = 0 THEN 1 ELSE 0 END) as pendientes,
+        SUM(CASE WHEN deployed = 1 THEN 1 ELSE 0 END) as desplegados,
+        SUM(CASE WHEN urgency = 'Alta' AND deployed = 0 THEN 1 ELSE 0 END) as urgentes,
+        SUM(CASE WHEN due_date IS NOT NULL AND due_date < CURRENT_DATE AND deployed = 0 THEN 1 ELSE 0 END) as vencidos,
+        SUM(CASE WHEN due_date IS NOT NULL AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' AND deployed = 0 THEN 1 ELSE 0 END) as proximos
+    FROM tasks WHERE user_id = ?
+");
+$stats_stmt->execute([$user_id]);
+$stats = $stats_stmt->fetch();
+
+// Filtros y búsqueda
+$search = $_GET['search'] ?? '';
 $filter = $_GET['filter'] ?? '';
-if ($filter === 'pending') {
-    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE user_id = ? AND deployed = 0 ORDER BY created_at DESC');
-    $stmt->execute([$user_id]);
-} else {
-    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC');
-    $stmt->execute([$user_id]);
+$category = $_GET['category'] ?? '';
+$priority = $_GET['priority'] ?? '';
+
+$sql = 'SELECT * FROM tasks WHERE user_id = ?';
+$params = [$user_id];
+
+if ($search) {
+    $sql .= ' AND (title ILIKE ? OR description ILIKE ?)';
+    $search_param = '%' . $search . '%';
+    $params[] = $search_param;
+    $params[] = $search_param;
 }
+
+if ($filter === 'pending') {
+    $sql .= ' AND deployed = 0';
+} elseif ($filter === 'deployed') {
+    $sql .= ' AND deployed = 1';
+} elseif ($filter === 'urgent') {
+    $sql .= ' AND urgency = \'Alta\' AND deployed = 0';
+} elseif ($filter === 'overdue') {
+    $sql .= ' AND due_date < CURRENT_DATE AND deployed = 0';
+}
+
+if ($category && $category !== 'all') {
+    $sql .= ' AND category = ?';
+    $params[] = $category;
+}
+
+if ($priority && $priority !== 'all') {
+    $sql .= ' AND priority = ?';
+    $params[] = $priority;
+}
+
+$sql .= ' ORDER BY created_at DESC';
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $tasks = $stmt->fetchAll();
 
 function esc($s) { 
@@ -48,6 +94,88 @@ function esc($s) {
     </a>
   </div>
 
+  <!-- Dashboard de Estadísticas -->
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['total'] ?></div>
+        <div class="stat-label">Total Tareas</div>
+      </div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['pendientes'] ?></div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+    </div>
+    <div class="stat-card deployed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['desplegados'] ?></div>
+        <div class="stat-label">Desplegados</div>
+      </div>
+    </div>
+    <div class="stat-card urgent">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['urgentes'] ?></div>
+        <div class="stat-label">Urgentes</div>
+      </div>
+    </div>
+    <div class="stat-card overdue">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['vencidos'] ?></div>
+        <div class="stat-label">Vencidos</div>
+      </div>
+    </div>
+    <div class="stat-card upcoming">
+      <div class="stat-icon">📅</div>
+      <div class="stat-info">
+        <div class="stat-value"><?= $stats['proximos'] ?></div>
+        <div class="stat-label">Esta Semana</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="filters-section">
+    <form method="get" action="index.php" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <input type="text" name="search" placeholder="🔍 Buscar tareas..." value="<?= esc($search) ?>" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
+      
+      <select name="filter" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
+        <option value="">📋 Todas</option>
+        <option value="pending" <?= $filter === 'pending' ? 'selected' : '' ?>>⏳ Pendientes</option>
+        <option value="deployed" <?= $filter === 'deployed' ? 'selected' : '' ?>>✅ Desplegados</option>
+        <option value="urgent" <?= $filter === 'urgent' ? 'selected' : '' ?>>🔥 Urgentes</option>
+        <option value="overdue" <?= $filter === 'overdue' ? 'selected' : '' ?>>⚠️ Vencidos</option>
+      </select>
+
+      <select name="category" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
+        <option value="all">🏷️ Categoría</option>
+        <option value="Frontend" <?= $category === 'Frontend' ? 'selected' : '' ?>>Frontend</option>
+        <option value="Backend" <?= $category === 'Backend' ? 'selected' : '' ?>>Backend</option>
+        <option value="Database" <?= $category === 'Database' ? 'selected' : '' ?>>Database</option>
+        <option value="Hotfix" <?= $category === 'Hotfix' ? 'selected' : '' ?>>Hotfix</option>
+        <option value="Feature" <?= $category === 'Feature' ? 'selected' : '' ?>>Feature</option>
+        <option value="Otro" <?= $category === 'Otro' ? 'selected' : '' ?>>Otro</option>
+      </select>
+
+      <select name="priority" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
+        <option value="all">⚡ Prioridad</option>
+        <option value="Crítico" <?= $priority === 'Crítico' ? 'selected' : '' ?>>🔴 Crítico</option>
+        <option value="Alto" <?= $priority === 'Alto' ? 'selected' : '' ?>>🟠 Alto</option>
+        <option value="Medio" <?= $priority === 'Medio' ? 'selected' : '' ?>>🟡 Medio</option>
+        <option value="Bajo" <?= $priority === 'Bajo' ? 'selected' : '' ?>>🟢 Bajo</option>
+      </select>
+
+      <button type="submit" class="btn" style="padding: 10px 20px;">Filtrar</button>
+      <a href="index.php" class="btn" style="padding: 10px 20px; background: var(--bg-secondary);">Limpiar</a>
+    </form>
+  </div>
+
   <div class="top-actions">
     <a class="btn" href="index.php" title="Ver todas las tareas">
       <span style="font-size: 1.2rem;">📋</span>
@@ -56,6 +184,10 @@ function esc($s) {
     <a class="btn" href="index.php?filter=pending" title="Tareas pendientes de producción">
       <span style="font-size: 1.2rem;">⏳</span>
       <span class="btn-text">Pendientes</span>
+    </a>
+    <a class="btn" href="calendar.php" title="Ver calendario de deployments">
+      <span style="font-size: 1.2rem;">📅</span>
+      <span class="btn-text">Calendario</span>
     </a>
     <button class="btn" onclick="openModal()" title="Crear nueva tarea">
       <span style="font-size: 1.2rem;">➕</span>
@@ -68,7 +200,7 @@ function esc($s) {
   <?php else: ?>
   <table>
     <thead>
-      <tr><th>Tarea</th><th>⚡ Estado</th><th>Descripción</th><th>📅 Vence</th><th>Acciones</th></tr>
+      <tr><th>Tarea</th><th>🏷️ Info</th><th>⚡ Estado</th><th>Descripción</th><th>📅 Vence</th><th>Acciones</th></tr>
     </thead>
     <tbody>
     <?php foreach ($tasks as $t): ?>
@@ -83,8 +215,11 @@ function esc($s) {
           $docs_status = "📄 {$completed_docs}/{$total_docs} docs";
         }
         $can_deploy = !$t['requires_docs'] || $docs_complete;
+        
+        // Verificar si está vencida
+        $is_overdue = $t['due_date'] && strtotime($t['due_date']) < time() && !$t['deployed'];
       ?>
-      <tr>
+      <tr <?= $is_overdue ? 'style="background: rgba(255, 107, 107, 0.1);"' : '' ?>>
         <td data-label="Tarea">
           <strong style="display: block; margin-bottom: 2px;"><?= esc($t['title']) ?></strong>
           
@@ -125,6 +260,29 @@ function esc($s) {
             </div>
           <?php endif; ?>
         </td>
+        <td data-label="🏷️ Info">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <?php if (!empty($t['category'])): ?>
+              <span class="badge" style="background: var(--accent-blue); font-size: 0.75rem; padding: 4px 8px;">
+                <?= esc($t['category']) ?>
+              </span>
+            <?php endif; ?>
+            <?php if (!empty($t['priority'])): ?>
+              <?php
+                $priority_colors = [
+                  'Crítico' => 'background: #ff4757; color: white;',
+                  'Alto' => 'background: #ffa502; color: white;',
+                  'Medio' => 'background: #f1c40f; color: #000;',
+                  'Bajo' => 'background: #2ed573; color: white;'
+                ];
+                $priority_style = $priority_colors[$t['priority']] ?? 'background: var(--bg-secondary);';
+              ?>
+              <span class="badge" style="<?= $priority_style ?> font-size: 0.75rem; padding: 4px 8px;">
+                <?= esc($t['priority']) ?>
+              </span>
+            <?php endif; ?>
+          </div>
+        </td>
         <td data-label="⚡ Estado">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <!-- Badge de urgencia -->
@@ -139,11 +297,20 @@ function esc($s) {
           </div>
         </td>
         <td data-label="Descripción"><?= nl2br(esc($t['description'])) ?></td>
-        <td data-label="📅 Vence"><?= esc($t['due_date']) ?: '-' ?></td>
+        <td data-label="📅 Vence">
+          <?php if ($t['due_date']): ?>
+            <span style="<?= $is_overdue ? 'color: var(--accent-red); font-weight: bold;' : '' ?>">
+              <?= esc($t['due_date']) ?>
+              <?= $is_overdue ? ' ⚠️' : '' ?>
+            </span>
+          <?php else: ?>
+            -
+          <?php endif; ?>
+        </td>
         <td data-label="Acciones">
           <?php if (!$t['deployed']): ?>
             <?php if ($can_deploy): ?>
-              <a class="btn" href="mark_deployed.php?id=<?= $t['id'] ?>">✅ Producción</a>
+              <a class="btn" href="#" onclick="openDeployModal(<?= $t['id'] ?>); return false;">✅ Producción</a>
             <?php else: ?>
               <a class="btn" href="edit.php?id=<?= $t['id'] ?>" style="background: var(--accent-yellow); color: #000;" title="Completa los documentos primero">
                 📋 <?= $completed_docs ?>/4
@@ -169,14 +336,40 @@ function esc($s) {
       <form action="add.php" method="post" id="taskForm">
         <label>Título de la tarea</label>
         <input type="text" name="title" required placeholder="Ej: Implementar nueva funcionalidad">
+        
         <label>Descripción</label>
         <textarea name="description" rows="3" placeholder="Detalles importantes..."></textarea>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label>🏷️ Categoría</label>
+            <select name="category">
+              <option value="Otro">Otro</option>
+              <option value="Frontend">Frontend</option>
+              <option value="Backend">Backend</option>
+              <option value="Database">Database</option>
+              <option value="Hotfix">Hotfix</option>
+              <option value="Feature">Feature</option>
+            </select>
+          </div>
+          <div>
+            <label>⚡ Prioridad</label>
+            <select name="priority">
+              <option value="Bajo">🟢 Bajo</option>
+              <option value="Medio" selected>🟡 Medio</option>
+              <option value="Alto">🟠 Alto</option>
+              <option value="Crítico">🔴 Crítico</option>
+            </select>
+          </div>
+        </div>
+        
         <label>⚡ Urgencia</label>
         <select name="urgency">
           <option value="Baja">Baja</option>
           <option value="Media" selected>Media</option>
           <option value="Alta">Alta</option>
         </select>
+        
         <label>📅 Fecha límite (opcional)</label>
         <input type="date" name="due_date">
         
@@ -206,6 +399,57 @@ function esc($s) {
     </div>
   </div>
 
+  <!-- Modal para marcar como desplegado con checklist -->
+  <div id="deployModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="margin: 0;">✅ Marcar como Desplegado</h2>
+        <button class="modal-close" onclick="closeDeployModal()">&times;</button>
+      </div>
+      <form id="deployForm" method="post" action="mark_deployed.php">
+        <input type="hidden" name="id" id="deployTaskId">
+        
+        <div style="background: var(--bg-input); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+          <h3 style="margin: 0 0 12px 0; color: var(--accent-blue);">📋 Checklist Pre-Deployment</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 12px;">
+            Verifica que todo esté listo antes de marcar como desplegado:
+          </p>
+          
+          <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+            <input type="checkbox" name="checklist_backup" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <span>💾 Backup realizado</span>
+          </label>
+          
+          <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+            <input type="checkbox" name="checklist_tests" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <span>🧪 Tests ejecutados</span>
+          </label>
+          
+          <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
+            <input type="checkbox" name="checklist_docs" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <span>📚 Documentación actualizada</span>
+          </label>
+          
+          <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; cursor: pointer;">
+            <input type="checkbox" name="checklist_team" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <span>👥 Equipo notificado</span>
+          </label>
+        </div>
+        
+        <label>⏱️ Tiempo de deployment (minutos - opcional)</label>
+        <input type="number" name="deployment_duration" min="1" placeholder="Ej: 15">
+        
+        <label>📝 Notas del deployment (opcional)</label>
+        <textarea name="deployment_notes" rows="3" placeholder="¿Hubo algún problema? ¿Qué se desplegó exactamente?"></textarea>
+        
+        <div style="margin-top:20px; display: flex; gap: 10px;">
+          <button class="btn" type="submit">✅ Confirmar Deployment</button>
+          <button class="btn red" type="button" onclick="closeDeployModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 <script>
 function openModal() {
   document.getElementById('taskModal').style.display = 'flex';
@@ -217,11 +461,25 @@ function closeModal() {
   document.getElementById('documentsSection').style.display = 'none';
 }
 
+function openDeployModal(taskId) {
+  document.getElementById('deployTaskId').value = taskId;
+  document.getElementById('deployModal').style.display = 'flex';
+}
+
+function closeDeployModal() {
+  document.getElementById('deployModal').style.display = 'none';
+  document.getElementById('deployForm').reset();
+}
+
 // Cerrar modal al hacer clic fuera
 window.onclick = function(event) {
-  const modal = document.getElementById('taskModal');
-  if (event.target === modal) {
+  const taskModal = document.getElementById('taskModal');
+  const deployModal = document.getElementById('deployModal');
+  if (event.target === taskModal) {
     closeModal();
+  }
+  if (event.target === deployModal) {
+    closeDeployModal();
   }
 }
 
