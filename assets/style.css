@@ -1325,6 +1325,10 @@ html {
   border: 2px solid var(--border-color);
 }
 
+.filters-toggle {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 12px;
@@ -1362,8 +1366,23 @@ html {
   }
   
   .filters-section {
-    padding: 12px;
+    padding: 0;
+    background: transparent;
+    border: none;
     margin-bottom: 16px;
+  }
+  
+  .filters-toggle {
+    display: block !important;
+  }
+  
+  #filtersForm {
+    display: none !important;
+    margin-top: 0;
+    padding: 12px;
+    background: var(--bg-input);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
   }
   
   .filters-section form {

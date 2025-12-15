@@ -142,7 +142,11 @@ function esc($s) {
 
   <!-- Barra de búsqueda y filtros -->
   <div class="filters-section">
-    <form method="get" action="index.php" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+    <div class="filters-toggle" onclick="toggleFilters()" style="display: none; cursor: pointer; padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 12px; font-weight: bold; text-align: center;">
+      🔍 Mostrar Filtros <span id="filterIcon">▼</span>
+    </div>
+    
+    <form method="get" action="index.php" id="filtersForm" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
       <input type="text" name="search" placeholder="🔍 Buscar tareas..." value="<?= esc($search) ?>" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
       
       <select name="filter" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
@@ -469,6 +473,19 @@ function openDeployModal(taskId) {
 function closeDeployModal() {
   document.getElementById('deployModal').style.display = 'none';
   document.getElementById('deployForm').reset();
+}
+
+function toggleFilters() {
+  const filtersForm = document.getElementById('filtersForm');
+  const filterIcon = document.getElementById('filterIcon');
+  
+  if (filtersForm.style.display === 'none') {
+    filtersForm.style.display = 'flex';
+    filterIcon.textContent = '▲';
+  } else {
+    filtersForm.style.display = 'none';
+    filterIcon.textContent = '▼';
+  }
 }
 
 // Cerrar modal al hacer clic fuera
