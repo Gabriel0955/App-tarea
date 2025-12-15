@@ -100,7 +100,7 @@ function esc($s) {
       <div class="stat-icon">📊</div>
       <div class="stat-info">
         <div class="stat-value"><?= $stats['total'] ?></div>
-        <div class="stat-label">Total Tareas</div>
+        <div class="stat-label">Total</div>
       </div>
     </div>
     <div class="stat-card pending">
@@ -135,7 +135,7 @@ function esc($s) {
       <div class="stat-icon">📅</div>
       <div class="stat-info">
         <div class="stat-value"><?= $stats['proximos'] ?></div>
-        <div class="stat-label">Esta Semana</div>
+        <div class="stat-label">7 días</div>
       </div>
     </div>
   </div>

@@ -1326,36 +1326,133 @@ html {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.9rem !important;
+  }
+  
   .dashboard-stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
   }
   
   .stat-card {
-    padding: 16px;
-    gap: 12px;
+    padding: 10px;
+    gap: 8px;
   }
   
   .stat-icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
   
   .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
   
   .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
   }
   
   .filters-section {
-    padding: 16px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .filters-section form {
+    gap: 8px !important;
+  }
+  
+  .filters-section input,
+  .filters-section select,
+  .filters-section button {
+    padding: 8px !important;
+    font-size: 0.85rem;
+  }
+  
+  .top-actions {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .btn-text {
+    display: none;
+  }
+  
+  table {
+    font-size: 0.85rem;
+  }
+  
+  .modal-content {
+    padding: 12px;
+  }
+  
+  .modal-content form {
+    padding: 12px;
+  }
+  
+  .modal-content input,
+  .modal-content select,
+  .modal-content textarea {
+    padding: 8px;
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+  
+  h1 {
+    font-size: 1.3rem;
+  }
+  
   .dashboard-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  
+  .stat-card {
+    padding: 8px;
+    gap: 6px;
+  }
+  
+  .stat-icon {
+    font-size: 1.2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .stat-label {
+    font-size: 0.6rem;
+  }
+  
+  .filters-section {
+    padding: 10px;
+  }
+  
+  .filters-section input {
+    min-width: 100px !important;
+  }
+  
+  .top-actions {
+    gap: 6px;
   }
 }
 
