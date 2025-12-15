@@ -39,8 +39,7 @@ if (!$user_stats) {
 $tasks_query = "SELECT id, title, urgency, category 
                 FROM tasks 
                 WHERE user_id = :user_id 
-                AND status != 'Completada' 
-                AND status != 'Desplegada'
+                AND deployed = 0
                 ORDER BY 
                   CASE urgency 
                     WHEN 'Alta' THEN 1 
