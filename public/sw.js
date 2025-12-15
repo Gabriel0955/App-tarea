@@ -1,9 +1,12 @@
 // Service Worker para App-Tareas PWA
-const CACHE_NAME = 'app-tareas-v1';
+const CACHE_NAME = 'app-tareas-v2'; // Incrementado para forzar actualización
 const urlsToCache = [
   '/public/index.php',
   '/public/login.php',
   '/public/calendar.php',
+  '/public/pomodoro.php',
+  '/public/achievements.php',
+  '/public/ranking.php',
   '/assets/style.css',
   '/assets/icon-192x192.png',
   '/assets/icon-512x512.png'
