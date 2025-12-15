@@ -74,11 +74,39 @@ function esc($s) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>App-Tareas | Gestión Profesional de Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
-  <meta name="description" content="Sistema de gestión de tareas con seguimiento de urgencias y estado de producción">
-  <meta name="theme-color" content="#1e2139">
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="App-Tareas">
+  <meta name="application-name" content="App-Tareas">
+  <meta name="msapplication-TileColor" content="#1e2139">
+  <meta name="msapplication-tap-highlight" content="no">
+  
+  <!-- Theme Colors -->
+  <meta name="theme-color" content="#1e2139">
+  <meta name="msapplication-navbutton-color" content="#1e2139">
+  
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="../assets/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="../assets/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="../assets/icon-96x96.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="../assets/icon-128x128.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="../assets/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../assets/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="../assets/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="384x384" href="../assets/icon-384x384.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="../assets/icon-512x512.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icon-16x16.png">
+  <link rel="shortcut icon" href="../assets/favicon.ico">
+  
+  <link rel="stylesheet" href="../assets/style.css">
+  <meta name="description" content="Sistema de gestión de tareas con seguimiento de urgencias y estado de producción">
 </head>
 <body>
 <div class="container">
@@ -473,6 +501,86 @@ function toggleDocuments() {
     // Desmarcar todos los documentos si se desactiva
     docInputs.forEach(input => input.checked = false);
   }
+}
+
+// Sistema de notificaciones del navegador
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showNotification(title, body, icon = '⚠️') {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, {
+      body: body,
+      icon: '../assets/icon.png',
+      badge: '../assets/badge.png',
+      tag: 'app-tareas-alert',
+      requireInteraction: false,
+      vibrate: [200, 100, 200]
+    });
+  }
+}
+
+function checkPendingTasks() {
+  const pendingCount = <?= $stats['pendientes'] ?>;
+  const overdueCount = <?= $stats['vencidos'] ?>;
+  const urgentCount = <?= $stats['urgentes'] ?>;
+  const upcomingCount = <?= $stats['proximos'] ?>;
+  
+  // Notificar tareas vencidas (prioridad alta)
+  if (overdueCount > 0) {
+    showNotification(
+      '⚠️ Tareas Vencidas!',
+      `Tienes ${overdueCount} tarea(s) que ya pasaron su fecha límite y necesitan atención urgente.`
+    );
+  }
+  // Notificar tareas urgentes pendientes
+  else if (urgentCount > 0) {
+    showNotification(
+      '🔥 Tareas Urgentes',
+      `Tienes ${urgentCount} tarea(s) urgentes pendientes de desplegar.`
+    );
+  }
+  // Notificar tareas próximas a vencer
+  else if (upcomingCount > 0) {
+    showNotification(
+      '📅 Tareas Próximas',
+      `Tienes ${upcomingCount} tarea(s) que vencen en los próximos 7 días.`
+    );
+  }
+  // Notificación general de pendientes
+  else if (pendingCount > 0) {
+    showNotification(
+      '⏳ Tareas Pendientes',
+      `Tienes ${pendingCount} tarea(s) pendientes de desplegar.`
+    );
+  }
+}
+
+// Pedir permiso al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  requestNotificationPermission();
+  
+  // Mostrar notificación después de 3 segundos (dar tiempo a que se cargue)
+  setTimeout(checkPendingTasks, 3000);
+  
+  // Verificar cada 30 minutos si hay tareas pendientes
+  setInterval(checkPendingTasks, 30 * 60 * 1000);
+});
+
+// Registrar Service Worker para PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js')
+      .then(function(registration) {
+        console.log('✅ Service Worker registrado:', registration.scope);
+      })
+      .catch(function(error) {
+        console.log('❌ Error al registrar Service Worker:', error);
+      });
+  });
 }
 </script>
 
