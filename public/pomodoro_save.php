@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
   exit;
 }
 
+$pdo = get_pdo();
 $user_id = $_SESSION['user_id'];
 $data = json_decode(file_get_contents('php://input'), true);
 
