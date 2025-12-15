@@ -134,11 +134,112 @@ function esc($s) {
       <span style="font-size: 1.2rem;">📅</span>
       <span class="btn-text">Calendario</span>
     </a>
+    <a class="btn" href="pomodoro.php" title="Temporizador Pomodoro y Gamificación" style="background: linear-gradient(135deg, #00c896 0%, #00a878 100%);">
+      <span style="font-size: 1.2rem;">🍅</span>
+      <span class="btn-text">Pomodoro</span>
+    </a>
     <button class="btn" onclick="openModal()" title="Crear nueva tarea">
       <span style="font-size: 1.2rem;">➕</span>
       <span class="btn-text">Nueva</span>
     </button>
   </div>
+
+  <!-- Widget de Gamificación -->
+  <?php
+  // Obtener estadísticas de gamificación
+  $gamification_query = "SELECT * FROM user_stats WHERE user_id = :user_id";
+  $gamification_stmt = $pdo->prepare($gamification_query);
+  $gamification_stmt->execute(['user_id' => $user_id]);
+  $user_stats = $gamification_stmt->fetch(PDO::FETCH_ASSOC);
+  
+  if (!$user_stats) {
+    // Crear registro si no existe
+    $create_stats = "INSERT INTO user_stats (user_id) VALUES (:user_id) RETURNING *";
+    $gamification_stmt = $pdo->prepare($create_stats);
+    $gamification_stmt->execute(['user_id' => $user_id]);
+    $user_stats = $gamification_stmt->fetch(PDO::FETCH_ASSOC);
+  }
+  
+  // Calcular progreso al siguiente nivel
+  $progress_percentage = $user_stats['points_to_next_level'] > 0 
+    ? min(100, ($user_stats['total_points'] / $user_stats['points_to_next_level']) * 100)
+    : 0;
+  
+  // Obtener últimos logros
+  $achievements_query = "SELECT a.icon, a.name, ua.unlocked_at
+                         FROM user_achievements ua
+                         JOIN achievements a ON ua.achievement_id = a.id
+                         WHERE ua.user_id = :user_id
+                         ORDER BY ua.unlocked_at DESC
+                         LIMIT 3";
+  $achievements_stmt = $pdo->prepare($achievements_query);
+  $achievements_stmt->execute(['user_id' => $user_id]);
+  $recent_achievements = $achievements_stmt->fetchAll(PDO::FETCH_ASSOC);
+  ?>
+  
+  <div style="background: rgba(30, 33, 57, 0.95); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(0, 180, 216, 0.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+      <h3 style="color: #00b4d8; margin: 0; font-size: 18px;">🏆 Tu Progreso</h3>
+      <a href="achievements.php" class="btn" style="font-size: 14px; padding: 8px 16px;">Ver Logros →</a>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;">
+      <!-- Nivel Badge -->
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; box-shadow: 0 4px 16px rgba(0, 180, 216, 0.4); margin-bottom: 8px;">
+          <?= $user_stats['current_level'] ?>
+        </div>
+        <div style="font-size: 12px; color: #b0b0b0;">Nivel</div>
+      </div>
+      
+      <!-- Progreso y Puntos -->
+      <div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: #b0b0b0; font-size: 13px;">
+            <strong style="color: #00b4d8;"><?= number_format($user_stats['total_points']) ?></strong> puntos
+          </span>
+          <span style="color: #808080; font-size: 12px;">
+            <?= number_format($user_stats['points_to_next_level'] - $user_stats['total_points']) ?> para nivel <?= $user_stats['current_level'] + 1 ?>
+          </span>
+        </div>
+        <div style="width: 100%; height: 10px; background: rgba(15, 17, 23, 0.8); border-radius: 5px; overflow: hidden;">
+          <div style="height: 100%; background: linear-gradient(90deg, #00c896 0%, #00b4d8 100%); width: <?= $progress_percentage ?>%; transition: width 0.5s ease; border-radius: 5px;"></div>
+        </div>
+        
+        <!-- Mini Stats -->
+        <div style="display: flex; gap: 24px; margin-top: 12px; font-size: 13px;">
+          <span title="Racha actual">
+            🔥 <strong style="color: #ff6b6b;"><?= $user_stats['current_streak'] ?></strong> días
+          </span>
+          <span title="Pomodoros completados">
+            🍅 <strong style="color: #00b4d8;"><?= $user_stats['pomodoros_completed'] ?></strong>
+          </span>
+          <span title="Tareas completadas">
+            ✅ <strong style="color: #00c896;"><?= $user_stats['tasks_completed'] ?></strong>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Últimos Logros -->
+      <div style="display: flex; gap: 8px;">
+        <?php if (empty($recent_achievements)): ?>
+          <div style="color: #808080; font-size: 12px; text-align: center; padding: 0 16px;">
+            ¡Completa tareas<br>para desbloquear<br>logros!
+          </div>
+        <?php else: ?>
+          <?php foreach ($recent_achievements as $ach): ?>
+            <div title="<?= htmlspecialchars($ach['name']) ?> - Desbloqueado el <?= date('d/m/Y', strtotime($ach['unlocked_at'])) ?>" 
+                 style="width: 50px; height: 50px; background: rgba(15, 17, 23, 0.8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid #00b4d8; cursor: pointer; transition: transform 0.2s ease;"
+                 onmouseover="this.style.transform='scale(1.1)'"
+                 onmouseout="this.style.transform='scale(1)'">
+              <?= $ach['icon'] ?>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+  
   <!-- Dashboard de Estadísticas -->
   <div class="dashboard-stats">
     <div class="stat-card">
