@@ -93,7 +93,24 @@ function esc($s) {
       🚪 Salir
     </a>
   </div>
-
+  <div class="top-actions">
+    <a class="btn" href="index.php" title="Ver todas las tareas">
+      <span style="font-size: 1.2rem;">📋</span>
+      <span class="btn-text">Todas</span>
+    </a>
+    <a class="btn" href="index.php?filter=pending" title="Tareas pendientes de producción">
+      <span style="font-size: 1.2rem;">⏳</span>
+      <span class="btn-text">Pendientes</span>
+    </a>
+    <a class="btn" href="calendar.php" title="Ver calendario de deployments">
+      <span style="font-size: 1.2rem;">📅</span>
+      <span class="btn-text">Calendario</span>
+    </a>
+    <button class="btn" onclick="openModal()" title="Crear nueva tarea">
+      <span style="font-size: 1.2rem;">➕</span>
+      <span class="btn-text">Nueva</span>
+    </button>
+  </div>
   <!-- Dashboard de Estadísticas -->
   <div class="dashboard-stats">
     <div class="stat-card">
@@ -140,64 +157,8 @@ function esc($s) {
     </div>
   </div>
 
-  <!-- Barra de búsqueda y filtros -->
-  <div class="filters-section">
-    <div class="filters-toggle" onclick="toggleFilters()" style="display: none; cursor: pointer; padding: 12px; background: var(--bg-secondary); border-radius: 8px; margin-bottom: 12px; font-weight: bold; text-align: center;">
-      🔍 Mostrar Filtros <span id="filterIcon">▼</span>
-    </div>
-    
-    <form method="get" action="index.php" id="filtersForm" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-      <input type="text" name="search" placeholder="🔍 Buscar tareas..." value="<?= esc($search) ?>" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
-      
-      <select name="filter" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
-        <option value="">📋 Todas</option>
-        <option value="pending" <?= $filter === 'pending' ? 'selected' : '' ?>>⏳ Pendientes</option>
-        <option value="deployed" <?= $filter === 'deployed' ? 'selected' : '' ?>>✅ Desplegados</option>
-        <option value="urgent" <?= $filter === 'urgent' ? 'selected' : '' ?>>🔥 Urgentes</option>
-        <option value="overdue" <?= $filter === 'overdue' ? 'selected' : '' ?>>⚠️ Vencidos</option>
-      </select>
 
-      <select name="category" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
-        <option value="all">🏷️ Categoría</option>
-        <option value="Frontend" <?= $category === 'Frontend' ? 'selected' : '' ?>>Frontend</option>
-        <option value="Backend" <?= $category === 'Backend' ? 'selected' : '' ?>>Backend</option>
-        <option value="Database" <?= $category === 'Database' ? 'selected' : '' ?>>Database</option>
-        <option value="Hotfix" <?= $category === 'Hotfix' ? 'selected' : '' ?>>Hotfix</option>
-        <option value="Feature" <?= $category === 'Feature' ? 'selected' : '' ?>>Feature</option>
-        <option value="Otro" <?= $category === 'Otro' ? 'selected' : '' ?>>Otro</option>
-      </select>
 
-      <select name="priority" style="padding: 10px; border-radius: 8px; border: 2px solid var(--border-color); background: var(--bg-input); color: var(--text-color);">
-        <option value="all">⚡ Prioridad</option>
-        <option value="Crítico" <?= $priority === 'Crítico' ? 'selected' : '' ?>>🔴 Crítico</option>
-        <option value="Alto" <?= $priority === 'Alto' ? 'selected' : '' ?>>🟠 Alto</option>
-        <option value="Medio" <?= $priority === 'Medio' ? 'selected' : '' ?>>🟡 Medio</option>
-        <option value="Bajo" <?= $priority === 'Bajo' ? 'selected' : '' ?>>🟢 Bajo</option>
-      </select>
-
-      <button type="submit" class="btn" style="padding: 10px 20px;">Filtrar</button>
-      <a href="index.php" class="btn" style="padding: 10px 20px; background: var(--bg-secondary);">Limpiar</a>
-    </form>
-  </div>
-
-  <div class="top-actions">
-    <a class="btn" href="index.php" title="Ver todas las tareas">
-      <span style="font-size: 1.2rem;">📋</span>
-      <span class="btn-text">Todas</span>
-    </a>
-    <a class="btn" href="index.php?filter=pending" title="Tareas pendientes de producción">
-      <span style="font-size: 1.2rem;">⏳</span>
-      <span class="btn-text">Pendientes</span>
-    </a>
-    <a class="btn" href="calendar.php" title="Ver calendario de deployments">
-      <span style="font-size: 1.2rem;">📅</span>
-      <span class="btn-text">Calendario</span>
-    </a>
-    <button class="btn" onclick="openModal()" title="Crear nueva tarea">
-      <span style="font-size: 1.2rem;">➕</span>
-      <span class="btn-text">Nueva</span>
-    </button>
-  </div>
 
   <?php if (count($tasks) === 0): ?>
     <p class="small">No hay tareas registradas.</p>
