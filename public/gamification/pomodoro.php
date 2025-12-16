@@ -443,7 +443,7 @@ $progress_percentage = calculateLevelProgress($user_stats['total_points'], $user
         <h1 style="color: #00b4d8; margin: 0;">🍅 Pomodoro & Gamificación</h1>
         <p style="color: #b0b0b0; margin: 8px 0 0 0;">¡Hola, <?= htmlspecialchars($username) ?>! Mantén tu enfoque y gana recompensas</p>
       </div>
-      <a href="index.php" class="btn" style="background: rgba(30, 33, 57, 0.8);">
+      <a href="../index.php" class="btn" style="background: rgba(30, 33, 57, 0.8);">
         ← Volver al Dashboard
       </a>
     </div>

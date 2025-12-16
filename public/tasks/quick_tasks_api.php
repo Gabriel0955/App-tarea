@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/QuickTaskService.php';
 
 header('Content-Type: application/json');
-
+$pdo = get_pdo();
 $quickTaskService = new QuickTaskService($pdo);
 $userId = $_SESSION['user_id'];
 

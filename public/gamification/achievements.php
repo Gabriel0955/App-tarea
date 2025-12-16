@@ -331,7 +331,7 @@ $tier_colors = [
         <a href="pomodoro.php" class="btn" style="background: rgba(30, 33, 57, 0.8);">
           🍅 Pomodoro
         </a>
-        <a href="index.php" class="btn" style="background: rgba(30, 33, 57, 0.8);">
+        <a href="../index.php" class="btn" style="background: rgba(30, 33, 57, 0.8);">
           ← Dashboard
         </a>
       </div>
