@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/TaskService.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
@@ -9,30 +10,20 @@ $username = get_current_username();
 
 $task_id = intval($_GET['id'] ?? 0);
 if ($task_id <= 0) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
-// Verificar que la tarea pertenece al usuario
-$stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?');
-$stmt->execute([$task_id, $user_id]);
-$task = $stmt->fetch(PDO::FETCH_ASSOC);
+// Verificar que la tarea pertenece al usuario usando servicio
+$task = getTaskById($pdo, $task_id, $user_id);
 
 if (!$task) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
-// Obtener historial
-$stmt = $pdo->prepare('
-    SELECT h.*, u.username 
-    FROM task_history h
-    JOIN users u ON h.user_id = u.id
-    WHERE h.task_id = ?
-    ORDER BY h.created_at DESC
-');
-$stmt->execute([$task_id]);
-$history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener historial usando servicio
+$history = getTaskHistory($pdo, $task_id);
 
 function esc($s) { 
     return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 

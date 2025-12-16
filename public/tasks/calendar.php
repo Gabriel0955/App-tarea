@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/TaskService.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
@@ -15,13 +16,8 @@ $year = intval($_GET['year'] ?? date('Y'));
 if ($month < 1 || $month > 12) $month = date('m');
 if ($year < 2020 || $year > 2100) $year = date('Y');
 
-// Obtener tareas del mes
-$start_date = sprintf('%04d-%02d-01', $year, $month);
-$end_date = date('Y-m-t', strtotime($start_date));
-
-$stmt = $pdo->prepare('SELECT * FROM tasks WHERE user_id = ? AND due_date BETWEEN ? AND ? ORDER BY due_date ASC');
-$stmt->execute([$user_id, $start_date, $end_date]);
-$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener tareas del mes usando servicio
+$tasks = getTasksByMonth($pdo, $user_id, $year, $month);
 
 // Organizar tareas por fecha
 $tasks_by_date = [];

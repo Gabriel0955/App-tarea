@@ -1,26 +1,20 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/GamificationService.php';
 
 if (!isset($_SESSION['user_id'])) {
-  header('Location: login.php');
+  header('Location: ../auth/login.php');
   exit;
 }
 
 $pdo = get_pdo();
 $user_id = $_SESSION['user_id'];
 
-// Obtener ranking global
-$ranking_query = "SELECT u.id, u.username, us.*,
-                  ROW_NUMBER() OVER (ORDER BY us.total_points DESC) as rank
-                  FROM user_stats us
-                  JOIN users u ON us.user_id = u.id
-                  ORDER BY us.total_points DESC
-                  LIMIT 50";
-$ranking_stmt = $pdo->query($ranking_query);
-$rankings = $ranking_stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener ranking global usando servicio
+$rankings = getGlobalRanking($pdo, 50);
 
 // Encontrar posición del usuario actual
 $current_user_rank = array_search($user_id, array_column($rankings, 'id'));

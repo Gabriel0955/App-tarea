@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../services/UserService.php';
 
 // Si ya está logueado, redirigir a index
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -19,18 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Por favor completa todos los campos';
     } else {
         $pdo = get_pdo();
-        $stmt = $pdo->prepare('SELECT id, username, password FROM users WHERE username = ? OR email = ?');
-        $stmt->execute([$username, $username]);
-        $user = $stmt->fetch();
+        $result = authenticateUser($pdo, $username, $password);
         
-        if ($user && password_verify($password, $user['password'])) {
+        if ($result['success']) {
             // Login exitoso
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            header('Location: index.php');
+            $_SESSION['user_id'] = $result['user']['id'];
+            $_SESSION['username'] = $result['user']['username'];
+            header('Location: ../index.php');
             exit;
         } else {
-            $error = 'Usuario o contraseña incorrectos';
+            $error = $result['error'];
         }
     }
 }

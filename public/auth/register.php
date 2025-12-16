@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../services/UserService.php';
 
 // Si ya está logueado, redirigir a index
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -18,42 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
     
-    // Validaciones
-    if ($username === '' || $email === '' || $password === '') {
-        $error = 'Por favor completa todos los campos';
-    } elseif (strlen($username) < 3) {
-        $error = 'El usuario debe tener al menos 3 caracteres';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Email inválido';
-    } elseif (strlen($password) < 6) {
-        $error = 'La contraseña debe tener al menos 6 caracteres';
-    } elseif ($password !== $password_confirm) {
+    // Validación de confirmación de contraseña
+    if ($password !== $password_confirm) {
         $error = 'Las contraseñas no coinciden';
+    } elseif ($username === '' || $email === '' || $password === '') {
+        $error = 'Por favor completa todos los campos';
     } else {
         $pdo = get_pdo();
+        $result = registerUser($pdo, $username, $email, $password);
         
-        // Verificar si el usuario o email ya existen
-        $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ? OR email = ?');
-        $stmt->execute([$username, $email]);
-        if ($stmt->fetch()) {
-            $error = 'El usuario o email ya están registrados';
+        if ($result['success']) {
+            $success = 'Cuenta creada exitosamente. Redirigiendo...';
+            
+            // Auto-login
+            $_SESSION['user_id'] = $result['user_id'];
+            $_SESSION['username'] = $result['username'];
+            
+            // Redirigir después de 2 segundos
+            header('Refresh: 2; url=../index.php');
         } else {
-            // Crear usuario
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?)');
-            try {
-                $stmt->execute([$username, $email, $password_hash]);
-                $success = 'Cuenta creada exitosamente. Redirigiendo...';
-                
-                // Auto-login
-                $_SESSION['user_id'] = $pdo->lastInsertId();
-                $_SESSION['username'] = $username;
-                
-                // Redirigir después de 2 segundos
-                header('Refresh: 2; url=index.php');
-            } catch (PDOException $e) {
-                $error = 'Error al crear la cuenta. Intenta de nuevo.';
-            }
+            $error = implode(', ', $result['errors']);
         }
     }
 }

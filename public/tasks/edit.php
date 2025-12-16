@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/TaskService.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
@@ -24,17 +25,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $doc_politica_respaldo = isset($_POST['doc_politica_respaldo']) ? 1 : 0;
 
     if ($title === '') {
-        header('Location: index.php?error=empty'); exit;
+        header('Location: ../index.php?error=empty'); exit;
     }
 
-    // Obtener valores anteriores para el historial
-    $stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?');
-    $stmt->execute([$id, $user_id]);
-    $old_task = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Obtener valores anteriores para el historial usando servicio
+    $old_task = getTaskById($pdo, $id, $user_id);
     
-    // Actualizar tarea
-    $stmt = $pdo->prepare('UPDATE tasks SET title = ?, description = ?, urgency = ?, priority = ?, category = ?, due_date = ?, deployed = ?, requires_docs = ?, doc_plan_prueba = ?, doc_plan_produccion = ?, doc_control_objeto = ?, doc_politica_respaldo = ? WHERE id = ? AND user_id = ?');
-    $stmt->execute([$title, $description, $urgency, $priority, $category, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo, $id, $user_id]);
+    // Actualizar tarea usando servicio
+    $task_data = [
+        'title' => $title,
+        'description' => $description,
+        'urgency' => $urgency,
+        'priority' => $priority,
+        'category' => $category,
+        'due_date' => $due,
+        'deployed' => $deployed,
+        'requires_docs' => $requires_docs,
+        'doc_plan_prueba' => $doc_plan_prueba,
+        'doc_plan_produccion' => $doc_plan_produccion,
+        'doc_control_objeto' => $doc_control_objeto,
+        'doc_politica_respaldo' => $doc_politica_respaldo
+    ];
+    updateTask($pdo, $id, $user_id, $task_data);
     
     // Registrar en historial si hubo cambios
     $changes = [];
@@ -46,20 +58,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($old_task['deployed'] != $deployed) $changes['deployed'] = ['old' => $old_task['deployed'], 'new' => $deployed];
     
     if (!empty($changes)) {
-        $stmt = $pdo->prepare('INSERT INTO task_history (task_id, user_id, action, old_values, new_values) VALUES (?, ?, ?, ?, ?)');
-        $stmt->execute([$id, $user_id, 'updated', json_encode($old_task), json_encode($changes)]);
+        addTaskHistory($pdo, $id, $user_id, 'updated', $old_task, $changes);
     }
     
-    header('Location: index.php'); exit;
+    header('Location: ../index.php'); exit;
 }
 
 $id = intval($_GET['id'] ?? 0);
-if ($id <= 0) { header('Location: index.php'); exit; }
+if ($id <= 0) { header('Location: ../index.php'); exit; }
 
-$stmt = $pdo->prepare('SELECT * FROM tasks WHERE id = ? AND user_id = ?');
-$stmt->execute([$id, $user_id]);
-$task = $stmt->fetch();
-if (!$task) { header('Location: index.php'); exit; }
+// Obtener tarea usando servicio
+$task = getTaskById($pdo, $id, $user_id);
+if (!$task) { header('Location: ../index.php'); exit; }
 
 function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
 
@@ -70,7 +80,7 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Editar tarea | App-Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
   <meta name="theme-color" content="#1e2139">
   <script>
     function toggleDocuments() {

@@ -1,11 +1,13 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/TaskService.php';
+require_once __DIR__ . '/../../services/GamificationService.php';
 
 if (!isset($_SESSION['user_id'])) {
-  header('Location: login.php');
+  header('Location: ../auth/login.php');
   exit;
 }
 
@@ -13,71 +15,20 @@ $pdo = get_pdo();
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? 'Usuario';
 
-// Obtener estadísticas del usuario
-$stats_query = "SELECT * FROM user_stats WHERE user_id = :user_id";
-$stats_stmt = $pdo->prepare($stats_query);
-$stats_stmt->execute(['user_id' => $user_id]);
-$user_stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+// Obtener estadísticas del usuario usando servicio
+$user_stats = getUserStats($pdo, $user_id);
 
-// Si no existe, crear registro
-if (!$user_stats) {
-  $create_stats = "INSERT INTO user_stats (user_id) VALUES (:user_id)";
-  $pdo->prepare($create_stats)->execute(['user_id' => $user_id]);
-  $user_stats = [
-    'total_points' => 0,
-    'current_level' => 1,
-    'points_to_next_level' => 100,
-    'current_streak' => 0,
-    'longest_streak' => 0,
-    'tasks_completed' => 0,
-    'pomodoros_completed' => 0,
-    'total_focus_time' => 0
-  ];
-}
+// Obtener tareas pendientes para el Pomodoro usando servicio
+$available_tasks = getPendingTasksForPomodoro($pdo, $user_id, 10);
 
-// Obtener tareas pendientes para el Pomodoro
-$tasks_query = "SELECT id, title, urgency, category 
-                FROM tasks 
-                WHERE user_id = :user_id 
-                AND deployed = 0
-                ORDER BY 
-                  CASE urgency 
-                    WHEN 'Alta' THEN 1 
-                    WHEN 'Media' THEN 2 
-                    ELSE 3 
-                  END,
-                  due_date ASC NULLS LAST
-                LIMIT 10";
-$tasks_stmt = $pdo->prepare($tasks_query);
-$tasks_stmt->execute(['user_id' => $user_id]);
-$available_tasks = $tasks_stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener últimas sesiones Pomodoro usando servicio
+$pomodoro_history = getPomodoroHistory($pdo, $user_id, 10);
 
-// Obtener últimas sesiones Pomodoro
-$pomodoro_history_query = "SELECT ps.*, t.title as task_title 
-                           FROM pomodoro_sessions ps
-                           LEFT JOIN tasks t ON ps.task_id = t.id
-                           WHERE ps.user_id = :user_id
-                           ORDER BY ps.started_at DESC
-                           LIMIT 10";
-$history_stmt = $pdo->prepare($pomodoro_history_query);
-$history_stmt->execute(['user_id' => $user_id]);
-$pomodoro_history = $history_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Obtener logros desbloqueados recientemente
-$achievements_query = "SELECT a.*, ua.unlocked_at
-                       FROM user_achievements ua
-                       JOIN achievements a ON ua.achievement_id = a.id
-                       WHERE ua.user_id = :user_id
-                       ORDER BY ua.unlocked_at DESC
-                       LIMIT 5";
-$achievements_stmt = $pdo->prepare($achievements_query);
-$achievements_stmt->execute(['user_id' => $user_id]);
-$recent_achievements = $achievements_stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener logros desbloqueados recientemente usando servicio
+$recent_achievements = getRecentAchievements($pdo, $user_id, 5);
 
 // Calcular progreso al siguiente nivel
-$progress_percentage = $user_stats['points_to_next_level'] > 0 
-  ? min(100, ($user_stats['total_points'] / $user_stats['points_to_next_level']) * 100)
-  : 0;
+$progress_percentage = calculateLevelProgress($user_stats['total_points'], $user_stats['points_to_next_level']);
 ?>
 <!DOCTYPE html>
 <html lang="es">

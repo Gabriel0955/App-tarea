@@ -1,10 +1,11 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/TaskService.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: index.php'); exit;
+    header('Location: ../index.php'); exit;
 }
 
 $user_id = get_current_user_id();
@@ -24,11 +25,26 @@ $doc_control_objeto = isset($_POST['doc_control_objeto']) && $_POST['doc_control
 $doc_politica_respaldo = isset($_POST['doc_politica_respaldo']) && $_POST['doc_politica_respaldo'] == '1' ? 1 : 0;
 
 if ($title === '') {
-    header('Location: index.php?error=empty'); exit;
+    header('Location: ../index.php?error=empty'); exit;
 }
 
+// Usar servicio para crear tarea
 $pdo = get_pdo();
-$stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, priority, category, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-$stmt->execute([$user_id, $title, $description, $urgency, $priority, $category, $due, $deployed, $requires_docs, $doc_plan_prueba, $doc_plan_produccion, $doc_control_objeto, $doc_politica_respaldo]);
+$task_data = [
+    'title' => $title,
+    'description' => $description,
+    'urgency' => $urgency,
+    'priority' => $priority,
+    'category' => $category,
+    'due_date' => $due,
+    'deployed' => $deployed,
+    'requires_docs' => $requires_docs,
+    'doc_plan_prueba' => $doc_plan_prueba,
+    'doc_plan_produccion' => $doc_plan_produccion,
+    'doc_control_objeto' => $doc_control_objeto,
+    'doc_politica_respaldo' => $doc_politica_respaldo
+];
 
-header('Location: index.php'); exit;
+createTask($pdo, $user_id, $task_data);
+
+header('Location: ../index.php'); exit;

@@ -2,24 +2,15 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/db.php';
 require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../services/TaskService.php';
+require_once __DIR__ . '/../services/GamificationService.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
 $username = get_current_username();
 
-// Estadísticas del dashboard
-$stats_stmt = $pdo->prepare("
-    SELECT 
-        COUNT(*) as total,
-        SUM(CASE WHEN deployed = 0 THEN 1 ELSE 0 END) as pendientes,
-        SUM(CASE WHEN deployed = 1 THEN 1 ELSE 0 END) as desplegados,
-        SUM(CASE WHEN urgency = 'Alta' AND deployed = 0 THEN 1 ELSE 0 END) as urgentes,
-        SUM(CASE WHEN due_date IS NOT NULL AND due_date < CURRENT_DATE AND deployed = 0 THEN 1 ELSE 0 END) as vencidos,
-        SUM(CASE WHEN due_date IS NOT NULL AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7 days' AND deployed = 0 THEN 1 ELSE 0 END) as proximos
-    FROM tasks WHERE user_id = ?
-");
-$stats_stmt->execute([$user_id]);
-$stats = $stats_stmt->fetch();
+// Estadísticas del dashboard usando servicio
+$stats = getTaskStatistics($pdo, $user_id);
 
 // Filtros y búsqueda
 $search = $_GET['search'] ?? '';
@@ -27,41 +18,8 @@ $filter = $_GET['filter'] ?? '';
 $category = $_GET['category'] ?? '';
 $priority = $_GET['priority'] ?? '';
 
-$sql = 'SELECT * FROM tasks WHERE user_id = ?';
-$params = [$user_id];
-
-if ($search) {
-    $sql .= ' AND (title ILIKE ? OR description ILIKE ?)';
-    $search_param = '%' . $search . '%';
-    $params[] = $search_param;
-    $params[] = $search_param;
-}
-
-if ($filter === 'pending') {
-    $sql .= ' AND deployed = 0';
-} elseif ($filter === 'deployed') {
-    $sql .= ' AND deployed = 1';
-} elseif ($filter === 'urgent') {
-    $sql .= ' AND urgency = \'Alta\' AND deployed = 0';
-} elseif ($filter === 'overdue') {
-    $sql .= ' AND due_date < CURRENT_DATE AND deployed = 0';
-}
-
-if ($category && $category !== 'all') {
-    $sql .= ' AND category = ?';
-    $params[] = $category;
-}
-
-if ($priority && $priority !== 'all') {
-    $sql .= ' AND priority = ?';
-    $params[] = $priority;
-}
-
-$sql .= ' ORDER BY created_at DESC';
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$tasks = $stmt->fetchAll();
+// Obtener tareas filtradas usando servicio
+$tasks = getTasksFiltered($pdo, $user_id, $search, $filter, $category, $priority);
 
 function esc($s) { 
   return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 
@@ -76,7 +34,7 @@ function esc($s) {
   <title>App-Tareas | Gestión Profesional de Tareas</title>
   
   <!-- PWA Meta Tags -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="pwa/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -117,8 +75,8 @@ function esc($s) {
         Bienvenido, <strong style="color: var(--accent-blue);"><?= esc($username) ?></strong>
       </p>
     </div>
-    <a class="btn red" href="logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
-      🚪 Salir
+    <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
+      🚺 Salir
     </a>
   </div>
   <div class="top-actions">
@@ -130,11 +88,11 @@ function esc($s) {
       <span style="font-size: 1.2rem;">⏳</span>
       <span class="btn-text">Pendientes</span>
     </a>
-    <a class="btn" href="calendar.php" title="Ver calendario de deployments">
+    <a class="btn" href="tasks/calendar.php" title="Ver calendario de deployments">
       <span style="font-size: 1.2rem;">📅</span>
       <span class="btn-text">Calendario</span>
     </a>
-    <a class="btn" href="pomodoro.php" title="Temporizador Pomodoro y Gamificación" style="background: linear-gradient(135deg, #00c896 0%, #00a878 100%);">
+    <a class="btn" href="gamification/pomodoro.php" title="Temporizador Pomodoro y Gamificación" style="background: linear-gradient(135deg, #00c896 0%, #00a878 100%);">
       <span style="font-size: 1.2rem;">🍅</span>
       <span class="btn-text">Pomodoro</span>
     </a>
@@ -146,41 +104,20 @@ function esc($s) {
 
   <!-- Widget de Gamificación -->
   <?php
-  // Obtener estadísticas de gamificación
-  $gamification_query = "SELECT * FROM user_stats WHERE user_id = :user_id";
-  $gamification_stmt = $pdo->prepare($gamification_query);
-  $gamification_stmt->execute(['user_id' => $user_id]);
-  $user_stats = $gamification_stmt->fetch(PDO::FETCH_ASSOC);
-  
-  if (!$user_stats) {
-    // Crear registro si no existe
-    $create_stats = "INSERT INTO user_stats (user_id) VALUES (:user_id) RETURNING *";
-    $gamification_stmt = $pdo->prepare($create_stats);
-    $gamification_stmt->execute(['user_id' => $user_id]);
-    $user_stats = $gamification_stmt->fetch(PDO::FETCH_ASSOC);
-  }
+  // Obtener estadísticas de gamificación usando servicio
+  $user_stats = getUserStats($pdo, $user_id);
   
   // Calcular progreso al siguiente nivel
-  $progress_percentage = $user_stats['points_to_next_level'] > 0 
-    ? min(100, ($user_stats['total_points'] / $user_stats['points_to_next_level']) * 100)
-    : 0;
+  $progress_percentage = calculateLevelProgress($user_stats['total_points'], $user_stats['points_to_next_level']);
   
-  // Obtener últimos logros
-  $achievements_query = "SELECT a.icon, a.name, ua.unlocked_at
-                         FROM user_achievements ua
-                         JOIN achievements a ON ua.achievement_id = a.id
-                         WHERE ua.user_id = :user_id
-                         ORDER BY ua.unlocked_at DESC
-                         LIMIT 3";
-  $achievements_stmt = $pdo->prepare($achievements_query);
-  $achievements_stmt->execute(['user_id' => $user_id]);
-  $recent_achievements = $achievements_stmt->fetchAll(PDO::FETCH_ASSOC);
+  // Obtener últimos logros usando servicio
+  $recent_achievements = getRecentAchievements($pdo, $user_id, 3);
   ?>
   
   <div style="background: rgba(30, 33, 57, 0.95); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 2px solid rgba(0, 180, 216, 0.3);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
       <h3 style="color: #00b4d8; margin: 0; font-size: 18px;">🏆 Tu Progreso</h3>
-      <a href="achievements.php" class="btn" style="font-size: 14px; padding: 8px 16px;">Ver Logros →</a>
+      <a href="gamification/achievements.php" class="btn" style="font-size: 14px; padding: 8px 16px;">Ver Logros →</a>
     </div>
     
     <div style="display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center;">
@@ -332,7 +269,7 @@ function esc($s) {
           <!-- Checkboxes de documentos -->
           <?php if ($t['requires_docs']): ?>
             <div style="margin-top: 6px; padding: 4px 6px; background: rgba(0,0,0,0.2); border-radius: 4px; font-size: 0.75rem; line-height: 1.3;">
-              <form method="post" action="update_doc.php" style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 8px;">
+              <form method="post" action="tasks/update_doc.php" style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 8px;">
                 <input type="hidden" name="task_id" value="<?= $t['id'] ?>">
                 <label style="display: inline-flex; align-items: center; cursor: pointer; white-space: nowrap;">
                   <input type="checkbox" name="doc_plan_prueba" value="1" <?= $t['doc_plan_prueba'] ? 'checked' : '' ?> onchange="this.form.submit()" style="margin: 0 3px 0 0;">
@@ -406,13 +343,13 @@ function esc($s) {
             <?php if ($can_deploy): ?>
               <a class="btn" href="#" onclick="openDeployModal(<?= $t['id'] ?>); return false;">✅ Producción</a>
             <?php else: ?>
-              <a class="btn" href="edit.php?id=<?= $t['id'] ?>" style="background: var(--accent-yellow); color: #000;" title="Completa los documentos primero">
+              <a class="btn" href="tasks/edit.php?id=<?= $t['id'] ?>" style="background: var(--accent-yellow); color: #000;" title="Completa los documentos primero">
                 📋 <?= $completed_docs ?>/4
               </a>
             <?php endif; ?>
           <?php endif; ?>
-          <a class="btn btn-icon" href="edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
-          <a class="btn btn-icon red" href="delete.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Eliminar esta tarea?')" title="Eliminar">🗑️</a>
+          <a class="btn btn-icon" href="tasks/edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
+          <a class="btn btn-icon red" href="tasks/delete.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Eliminar esta tarea?')" title="Eliminar">🗑️</a>
         </td>
       </tr>
     <?php endforeach; ?>
@@ -427,7 +364,7 @@ function esc($s) {
         <h2 style="margin: 0;">➕ Nueva Tarea</h2>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <form action="add.php" method="post" id="taskForm">
+      <form action="tasks/add.php" method="post" id="taskForm">
         <label>Título de la tarea</label>
         <input type="text" name="title" required placeholder="Ej: Implementar nueva funcionalidad">
         
@@ -500,7 +437,7 @@ function esc($s) {
         <h2 style="margin: 0;">✅ Marcar como Desplegado</h2>
         <button class="modal-close" onclick="closeDeployModal()">&times;</button>
       </div>
-      <form id="deployForm" method="post" action="mark_deployed.php">
+      <form id="deployForm" method="post" action="tasks/mark_deployed.php">
         <input type="hidden" name="id" id="deployTaskId">
         
         <div style="background: var(--bg-input); padding: 16px; border-radius: 8px; margin-bottom: 16px;">

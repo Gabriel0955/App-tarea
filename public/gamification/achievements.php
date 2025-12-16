@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../src/db.php';
-require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../services/GamificationService.php';
 
 if (!isset($_SESSION['user_id'])) {
-  header('Location: login.php');
+  header('Location: ../auth/login.php');
   exit;
 }
 
@@ -13,25 +14,8 @@ $pdo = get_pdo();
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? 'Usuario';
 
-// Obtener todos los logros
-$achievements_query = "SELECT a.*, 
-                       ua.unlocked_at,
-                       CASE WHEN ua.id IS NOT NULL THEN TRUE ELSE FALSE END as is_unlocked
-                       FROM achievements a
-                       LEFT JOIN user_achievements ua ON a.id = ua.achievement_id AND ua.user_id = :user_id
-                       ORDER BY 
-                         is_unlocked DESC,
-                         CASE a.tier
-                           WHEN 'diamond' THEN 5
-                           WHEN 'platinum' THEN 4
-                           WHEN 'gold' THEN 3
-                           WHEN 'silver' THEN 2
-                           ELSE 1
-                         END DESC,
-                         a.points DESC";
-$stmt = $pdo->prepare($achievements_query);
-$stmt->execute(['user_id' => $user_id]);
-$achievements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Obtener todos los logros usando servicio
+$achievements = getAllAchievements($pdo, $user_id);
 
 // Agrupar por categoría
 $by_category = [];
@@ -43,16 +27,11 @@ foreach ($achievements as $ach) {
   $by_category[$category][] = $ach;
 }
 
-// Obtener estadísticas de usuario
-$stats_query = "SELECT * FROM user_stats WHERE user_id = :user_id";
-$stats_stmt = $pdo->prepare($stats_query);
-$stats_stmt->execute(['user_id' => $user_id]);
-$user_stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+// Obtener estadísticas de usuario usando servicio
+$user_stats = getUserStats($pdo, $user_id);
 
-// Calcular progreso
-$total_achievements = count($achievements);
-$unlocked_count = count(array_filter($achievements, fn($a) => $a['is_unlocked']));
-$completion_percentage = $total_achievements > 0 ? ($unlocked_count / $total_achievements) * 100 : 0;
+// Calcular progreso usando servicio
+$completion_percentage = calculateAchievementProgress($achievements);
 
 // Mapeo de categorías
 $category_names = [
