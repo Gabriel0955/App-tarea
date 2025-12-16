@@ -1,0 +1,181 @@
+# Sistema de Tareas Rápidas - Implementado ✅
+
+## 📋 Descripción
+Se ha agregado un sistema completo de **tareas rápidas** para el día a día. Permite crear tareas simples como:
+- 📞 Reuniones
+- 📄 Revisiones de documentos  
+- ☎️ Llamadas
+- ✉️ Emails importantes
+- 🔍 Revisiones rápidas
+
+## ✨ Características
+
+### Gamificación Integrada
+- **5 puntos** si completas la tarea el mismo día que la creaste
+- **3 puntos** si la completas después
+- Las tareas completadas suman a tu racha y progreso de nivel
+
+### Funcionalidades
+- ✅ Crear tareas con título y hora opcional
+- ✅ Marcar como completadas (checkbox)
+- ✅ Ver tareas por fecha (navegación de días)
+- ✅ Eliminar tareas no completadas
+- ✅ Estadísticas de completadas hoy
+- ✅ Puntos ganados visibles
+- ✅ Interface simple y rápida
+
+## 📁 Archivos Creados
+
+### 1. Base de Datos
+- `db/add_quick_tasks.sql` - Migración de la base de datos
+
+### 2. Servicio
+- `services/QuickTaskService.php` - Lógica de negocio
+
+### 3. Interface
+- `public/tasks/quick_tasks.php` - Página principal
+- `public/tasks/quick_tasks_api.php` - API REST para operaciones
+
+## 🚀 Instalación
+
+### Paso 1: Ejecutar migración de base de datos
+
+**Opción A - PostgreSQL con psql:**
+```bash
+psql -U postgres -d app_tareas -f db/add_quick_tasks.sql
+```
+
+**Opción B - Desde pgAdmin:**
+1. Abrir pgAdmin
+2. Conectar a tu base de datos `app_tareas`
+3. Abrir Query Tool
+4. Copiar y pegar el contenido de `db/add_quick_tasks.sql`
+5. Ejecutar (F5)
+
+**Opción C - PowerShell (si tienes psql configurado):**
+```powershell
+cd c:\wamp64\www\App-Tareas
+$env:PGPASSWORD="tu_password"
+psql -U postgres -d app_tareas -f db\add_quick_tasks.sql
+```
+
+### Paso 2: Verificar instalación
+La migración crea:
+- ✅ Tabla `quick_tasks`
+- ✅ Índices para rendimiento
+- ✅ Trigger para `updated_at`
+- ✅ Función `complete_quick_task()` para gamificación
+- ✅ Integración con sistema de puntos existente
+
+## 🎯 Uso
+
+1. **Acceder**: Click en el botón **"⚡ Rápidas"** en el menú principal
+2. **Crear tarea**: Escribe el título y opcionalmente la hora → Click "Agregar"
+3. **Completar**: Marca el checkbox cuando termines la tarea
+4. **Ver otros días**: Usa el selector de fecha para ver/agregar tareas de otros días
+5. **Eliminar**: Click en 🗑️ para borrar tareas no completadas
+
+## 💡 Ejemplos de Tareas Rápidas
+
+```
+✅ Reunión con el equipo - 10:00
+✅ Revisar documento de arquitectura - 14:00  
+✅ Llamada con cliente
+✅ Enviar reporte semanal
+✅ Code review de PR #123
+✅ Actualizar documentación
+```
+
+## 📊 Gamificación
+
+### Puntos
+- **Completada el mismo día**: +5 puntos 🎉
+- **Completada después**: +3 puntos
+
+### Integración
+- ✅ Suma a puntos totales
+- ✅ Cuenta para racha diaria
+- ✅ Activa logros automáticamente
+- ✅ Estadísticas en dashboard
+
+### Estadísticas Visibles
+- Completadas hoy vs Total hoy
+- Tareas hechas el mismo día (últimos 30 días)
+- Total de puntos ganados con tareas rápidas
+
+## 🔧 Estructura Técnica
+
+### Base de Datos
+```sql
+quick_tasks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    task_date DATE DEFAULT CURRENT_DATE,
+    scheduled_time TIME,
+    completed BOOLEAN DEFAULT FALSE,
+    completed_at TIMESTAMP,
+    points_awarded INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+```
+
+### API Endpoints (quick_tasks_api.php)
+- `POST action=create` - Crear tarea
+- `POST action=complete` - Completar tarea  
+- `POST action=uncomplete` - Desmarcar tarea
+- `POST action=delete` - Eliminar tarea
+
+### Métodos del Servicio
+```php
+createQuickTask($userId, $title, $description, $taskDate, $scheduledTime)
+getQuickTasksByDate($userId, $date)
+getWeekQuickTasks($userId)
+completeQuickTask($taskId, $userId)
+uncompleteQuickTask($taskId, $userId)
+updateQuickTask($taskId, $userId, $title, ...)
+deleteQuickTask($taskId, $userId)
+getQuickTaskStats($userId)
+```
+
+## 🎨 Interfaz
+
+### Colores del Tema
+- Botón principal: Gradiente púrpura (`#667eea` → `#764ba2`)
+- Hora programada: Azul claro (`#e3f2fd` / `#1976d2`)
+- Puntos ganados: Naranja (`#fff3e0` / `#f57c00`)
+- Completadas: Opacidad 60%
+
+### Responsive
+- ✅ Mobile-friendly
+- ✅ Grid adaptativo para estadísticas
+- ✅ Botones táctiles optimizados
+
+## ⚠️ Notas Importantes
+
+1. **No se pueden eliminar** tareas ya completadas (preserva historial)
+2. **Solo el usuario dueño** puede ver/modificar sus tareas rápidas
+3. Las tareas se organizan por **fecha**, no por proyecto
+4. Ideal para tareas que se completan en **minutos/horas**, no días
+5. Para tareas grandes, usar el sistema principal de tareas
+
+## 🔮 Futuras Mejoras Posibles
+
+- [ ] Plantillas de tareas frecuentes
+- [ ] Notificaciones push por hora programada
+- [ ] Vista semanal/mensual
+- [ ] Tags/categorías para tareas rápidas
+- [ ] Exportar lista del día a PDF
+- [ ] Integración con calendario principal
+- [ ] Modo "Focus" para ocultar completadas
+
+## 📝 Changelog
+
+### v1.0.0 - 16/12/2025
+- ✨ Sistema completo de tareas rápidas
+- ✨ Gamificación con puntos variables (5/3)
+- ✨ Interface responsive y moderna
+- ✨ Integración total con sistema de puntos existente
+- ✨ Estadísticas en tiempo real

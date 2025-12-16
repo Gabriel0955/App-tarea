@@ -186,7 +186,7 @@ function getPendingTasksForPomodoro($pdo, $user_id, $limit = 10) {
  * Marcar tarea como desplegada con checklist
  */
 function markTaskAsDeployed($pdo, $task_id, $user_id, $deployment_data) {
-    $stmt = $pdo->prepare('UPDATE tasks SET deployed = 1, deployed_at = NOW(), deployed_by = ?, deployment_notes = ?, deployment_duration = ?, checklist_backup = ?, checklist_tests = ?, checklist_docs = ?, checklist_team = ?, status = ? WHERE id = ? AND user_id = ?');
+    $stmt = $pdo->prepare('UPDATE tasks SET deployed = 1, deployed_at = NOW(), deployed_by = ?, deployment_notes = ?, deployment_duration = ?, checklist_backup = ?, checklist_tests = ?, checklist_docs = ?, checklist_team = ? WHERE id = ? AND user_id = ?');
     
     return $stmt->execute([
         $user_id,
@@ -196,7 +196,6 @@ function markTaskAsDeployed($pdo, $task_id, $user_id, $deployment_data) {
         $deployment_data['checklist_tests'],
         $deployment_data['checklist_docs'],
         $deployment_data['checklist_team'],
-        'Desplegada',
         $task_id,
         $user_id
     ]);

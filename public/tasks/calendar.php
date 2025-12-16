@@ -19,6 +19,9 @@ if ($year < 2020 || $year > 2100) $year = date('Y');
 // Obtener tareas del mes usando servicio
 $tasks = getTasksByMonth($pdo, $user_id, $year, $month);
 
+// Calcular start_date para el calendario
+$start_date = sprintf('%04d-%02d-01', $year, $month);
+
 // Organizar tareas por fecha
 $tasks_by_date = [];
 foreach ($tasks as $task) {
