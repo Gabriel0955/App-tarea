@@ -47,7 +47,7 @@ function format_action($action) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Historial - <?= esc($task['title']) ?></title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
 </head>
 <body>
 <div class="container">
@@ -62,7 +62,7 @@ function format_action($action) {
       <a class="btn" href="edit.php?id=<?= $task_id ?>" title="Volver a la tarea">
         ← Volver
       </a>
-      <a class="btn red" href="logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
+      <a class="btn red" href="../auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
         🚪 Salir
       </a>
     </div>

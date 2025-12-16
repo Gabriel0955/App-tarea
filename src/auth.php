@@ -6,7 +6,14 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Verificar si el usuario está autenticado
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    // Detectar si estamos en una subcarpeta
+    $script_path = $_SERVER['SCRIPT_NAME'];
+    if (strpos($script_path, '/public/tasks/') !== false || 
+        strpos($script_path, '/public/gamification/') !== false) {
+        header('Location: ../auth/login.php');
+    } else {
+        header('Location: auth/login.php');
+    }
     exit;
 }
 

@@ -42,7 +42,7 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Iniciar Sesión | App-Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
   <meta name="theme-color" content="#1e2139">
   <style>
     body {

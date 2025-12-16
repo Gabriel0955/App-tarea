@@ -57,7 +57,7 @@ $tier_colors = [
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Logros | App-Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
   <style>
     .achievements-container {
       max-width: 1400px;

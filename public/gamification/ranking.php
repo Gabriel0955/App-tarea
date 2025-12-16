@@ -25,7 +25,7 @@ $current_user_rank = array_search($user_id, array_column($rankings, 'id'));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ranking | App-Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
   <style>
     .ranking-container {
       max-width: 1000px;

@@ -60,7 +60,7 @@ function esc($s) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Calendario - App-Tareas</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link rel="stylesheet" href="../../assets/style.css">
   <style>
     .calendar-container {
       max-width: 1200px;
@@ -179,10 +179,10 @@ function esc($s) {
       </p>
     </div>
     <div style="display: flex; gap: 10px;">
-      <a class="btn" href="index.php" title="Volver al inicio">
-        🏠 Inicio
+      <a class="btn" href="../index.php" title="Volver al inicio">
+        ← Inicio
       </a>
-      <a class="btn red" href="logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
+      <a class="btn red" href="../auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
         🚪 Salir
       </a>
     </div>
