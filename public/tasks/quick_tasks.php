@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/QuickTaskService.php';
+require_once __DIR__ . '/../../src/db.php';
 $pdo = get_pdo();
 $quickTaskService = new QuickTaskService($pdo);
 $userId = $_SESSION['user_id'];
