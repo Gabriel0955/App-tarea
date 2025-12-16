@@ -76,6 +76,11 @@ class QuickTaskService {
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
             
         } catch (PDOException $e) {
+            // Si la tabla no existe, devolver array vacío
+            if (strpos($e->getMessage(), 'relation "quick_tasks" does not exist') !== false) {
+                error_log("Tabla quick_tasks no existe. Por favor ejecutar db/add_quick_tasks.sql");
+                return [];
+            }
             error_log("Error obteniendo tareas rápidas: " . $e->getMessage());
             return [];
         }

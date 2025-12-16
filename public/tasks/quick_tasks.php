@@ -9,9 +9,22 @@ $userId = $_SESSION['user_id'];
 // Obtener fecha seleccionada (hoy por defecto)
 $selectedDate = $_GET['date'] ?? date('Y-m-d');
 
-// Obtener tareas del día
-$tasks = $quickTaskService->getQuickTasksByDate($userId, $selectedDate);
-$stats = $quickTaskService->getQuickTaskStats($userId);
+// Verificar si la tabla existe
+$tableExists = true;
+try {
+    $pdo->query("SELECT 1 FROM quick_tasks LIMIT 1");
+} catch (PDOException $e) {
+    $tableExists = false;
+}
+
+// Obtener tareas del día solo si la tabla existe
+$tasks = $tableExists ? $quickTaskService->getQuickTasksByDate($userId, $selectedDate) : [];
+$stats = $tableExists ? $quickTaskService->getQuickTaskStats($userId) : [
+    'today_completed' => 0,
+    'today_tasks' => 0,
+    'completed_same_day' => 0,
+    'total_points' => 0
+];
 
 $pageTitle = "Tareas Rápidas";
 ?>
@@ -242,6 +255,15 @@ $pageTitle = "Tareas Rápidas";
         <h1>📝 Tareas Rápidas del Día</h1>
         <p>Crea tareas simples como reuniones, llamadas o revisiones. ¡Completa tus tareas y gana puntos! 🎯</p>
         
+        <?php if (!$tableExists): ?>
+            <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 20px; border-radius: 8px; margin: 20px 0; color: #856404;">
+                <h3 style="margin-top: 0; color: #856404;">⚠️ Tabla de Tareas Rápidas no está instalada</h3>
+                <p>Para usar esta funcionalidad, necesitas ejecutar la migración de base de datos:</p>
+                <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; color: #212529;">psql -h apptarea.postgres.database.azure.com -U apptarea -d postgres -f db/add_quick_tasks.sql</pre>
+                <p style="margin-bottom: 0;">O ejecuta el contenido del archivo <code>db/add_quick_tasks.sql</code> desde pgAdmin.</p>
+            </div>
+        <?php else: ?>
+        
         <!-- Estadísticas -->
         <div class="stats-bar">
             <div class="stat-card">
@@ -320,35 +342,40 @@ $pageTitle = "Tareas Rápidas";
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+        
+        <?php endif; // fin del check $tableExists ?>
     </div>
     
     <script>
         // Agregar tarea rápida
-        document.getElementById('quickAddForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            formData.append('action', 'create');
-            formData.append('date', '<?php echo $selectedDate; ?>');
-            
-            try {
-                const response = await fetch('quick_tasks_api.php', {
-                    method: 'POST',
-                    body: formData
-                });
+        const quickAddForm = document.getElementById('quickAddForm');
+        if (quickAddForm) {
+            quickAddForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
                 
-                const result = await response.json();
+                const formData = new FormData(e.target);
+                formData.append('action', 'create');
+                formData.append('date', '<?php echo $selectedDate; ?>');
                 
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + (result.error || 'No se pudo crear la tarea'));
+                try {
+                    const response = await fetch('quick_tasks_api.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (result.error || 'No se pudo crear la tarea'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al crear la tarea');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error al crear la tarea');
-            }
-        });
+            });
+        }
         
         // Marcar/desmarcar tarea como completada
         async function toggleTask(taskId, completed) {

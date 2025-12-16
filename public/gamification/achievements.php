@@ -34,7 +34,7 @@ $user_stats = getUserStats($pdo, $user_id);
 $completion_percentage = calculateAchievementProgress($achievements);
 
 // Contar logros desbloqueados y totales
-$unlocked_count = count(array_filter($achievements, function($a) { return $a['unlocked']; }));
+$unlocked_count = count(array_filter($achievements, function($a) { return $a['is_unlocked'] ?? false; }));
 $total_achievements = count($achievements);
 
 // Mapeo de categorías

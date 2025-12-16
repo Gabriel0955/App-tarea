@@ -1,0 +1,132 @@
+# Script para corregir errores en producción
+
+## ✅ Errores Corregidos
+
+### 1. ❌ Error: Undefined variable $start_date en calendar.php
+**Línea 33-35**
+```
+PHP Warning: Undefined variable $start_date
+PHP Deprecated: strtotime(): Passing null to parameter #1
+```
+
+**Solución:** Definir `$start_date` antes de usarla:
+```php
+$start_date = sprintf('%04d-%02d-01', $year, $month);
+```
+
+### 2. ❌ Error: Undefined array key "unlocked" en achievements.php
+**Línea 37** (múltiples warnings)
+```
+PHP Warning: Undefined array key "unlocked"
+```
+
+**Solución:** Cambiar de `$a['unlocked']` a `$a['is_unlocked']` para coincidir con el nombre del campo en SQL:
+```php
+// ANTES
+$unlocked_count = count(array_filter($achievements, function($a) { return $a['unlocked']; }));
+
+// DESPUÉS
+$unlocked_count = count(array_filter($achievements, function($a) { return $a['is_unlocked'] ?? false; }));
+```
+
+### 3. ❌ Error: Column "status" does not exist en TaskService.php
+**Línea 191**
+```
+PDOException: SQLSTATE[42703]: Undefined column: 7 ERROR: column "status" of relation "tasks" does not exist
+```
+
+**Solución:** Eliminar la columna `status` del UPDATE ya que no existe en la tabla:
+```php
+// ANTES (con status)
+UPDATE tasks SET deployed = 1, ..., status = ? WHERE id = ?
+
+// DESPUÉS (sin status)
+UPDATE tasks SET deployed = 1, ... WHERE id = ?
+```
+
+### 4. ❌ Error: Tabla quick_tasks no existe
+**QuickTaskService.php línea 52**
+```
+PDOException: relation "quick_tasks" does not exist
+```
+
+**Solución:** 
+- Agregado manejo de excepciones para detectar si tabla no existe
+- Página quick_tasks.php ahora muestra mensaje amigable con instrucciones
+- Devuelve array vacío en lugar de error fatal
+
+## 📁 Archivos Modificados
+
+1. ✅ `public/tasks/calendar.php` - Variable $start_date definida
+2. ✅ `public/gamification/achievements.php` - Campo cambiado a 'is_unlocked' con null coalescing
+3. ✅ `services/TaskService.php` - Columna status eliminada del UPDATE
+4. ✅ `services/QuickTaskService.php` - Manejo de error cuando tabla no existe
+5. ✅ `public/tasks/quick_tasks.php` - Mensaje de alerta si tabla no existe, verificación de elementos DOM
+
+## 🚀 Desplegar Cambios
+
+```powershell
+# Subir cambios a Git
+cd c:\wamp64\www\App-Tareas
+git add .
+git commit -m "Fix: Corregir variables indefinidas, campo is_unlocked y manejo de tabla inexistente"
+git push origin main
+```
+
+## ⚠️ IMPORTANTE: Ejecutar Migración
+
+Para habilitar Tareas Rápidas, ejecutar:
+
+```powershell
+cd c:\wamp64\www\App-Tareas
+$env:PGPASSWORD="Gabriel1405"
+psql -h apptarea.postgres.database.azure.com -U apptarea -d postgres -p 5432 -f db\add_quick_tasks.sql
+```
+
+O desde **pgAdmin**:
+1. Conectar a `apptarea.postgres.database.azure.com`
+2. Abrir Query Tool
+3. Copiar contenido de `db/add_quick_tasks.sql`
+4. Ejecutar (F5)
+
+## ✨ Resultado Esperado
+
+Después de desplegar estos cambios:
+
+- ✅ No más warnings de "Undefined variable $start_date"
+- ✅ No más warnings de "Undefined array key 'unlocked'"
+- ✅ No más errores 500 al marcar tareas como desplegadas
+- ✅ No más errores de columna "status" inexistente
+- ✅ Mensaje amigable si tabla quick_tasks no existe
+- ✅ No hay errores de JavaScript por elementos DOM inexistentes
+
+## 🧪 Testing Recomendado
+
+1. **Probar Calendar:** 
+   - Navegar a `/public/tasks/calendar.php`
+   - Cambiar de mes usando los botones
+   - Verificar que no haya errores en logs
+
+2. **Probar Achievements:**
+   - Navegar a `/public/gamification/achievements.php`
+   - Verificar que muestre "X / Y logros" correctamente
+   - Verificar progreso de porcentaje
+
+3. **Probar Mark Deployed:**
+   - Ir a una tarea pendiente
+   - Click en "Marcar como Desplegada"
+   - Llenar el formulario y enviar
+   - Verificar que se marque correctamente sin error 500
+
+4. **Probar Quick Tasks (después de migración):**
+   - Navegar a `/public/tasks/quick_tasks.php`
+   - Si no migrado: ver mensaje de advertencia
+   - Después de migrar: crear, completar y eliminar tareas
+
+## 📊 Validación
+
+Todos los errores identificados en los logs han sido corregidos:
+- ✅ calendar.php línea 33-35
+- ✅ achievements.php línea 37 (campo 'unlocked' → 'is_unlocked')
+- ✅ TaskService.php línea 191
+- ✅ QuickTaskService.php línea 52 (manejo de tabla inexistente)
