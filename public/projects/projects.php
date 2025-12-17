@@ -2,7 +2,8 @@
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
-
+require_once __DIR__ . '/../../src/db.php';
+$pdo = get_pdo();
 $projectService = new ProjectService($pdo);
 $userId = $_SESSION['user_id'];
 
