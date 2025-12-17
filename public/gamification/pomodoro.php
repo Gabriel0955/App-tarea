@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/db.php';
 require_once __DIR__ . '/../../src/auth.php';
+require_once __DIR__ . '/../../src/theme.php';
 require_once __DIR__ . '/../../services/TaskService.php';
 require_once __DIR__ . '/../../services/GamificationService.php';
 
@@ -35,6 +36,7 @@ $progress_percentage = calculateLevelProgress($user_stats['total_points'], $user
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <?php echo getThemeStyles(); ?>
   <title>Pomodoro & Gamificación | App-Tareas</title>
   <link rel="stylesheet" href="../../assets/style.css">
   <style>

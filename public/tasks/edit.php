@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/db.php';
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../services/TaskService.php';
+require_once __DIR__ . '/../../src/theme.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
@@ -77,6 +78,7 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
 <!doctype html>
 <html lang="es">
 <head>
+  <?php echo getThemeStyles(); ?>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Editar tarea | App-Tareas</title>

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/db.php';
 require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../src/theme.php';
 require_once __DIR__ . '/../services/TaskService.php';
 require_once __DIR__ . '/../services/GamificationService.php';
 require_once __DIR__ . '/../services/ProjectService.php';
@@ -49,6 +50,8 @@ function esc($s) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>App-Tareas | Gestión Profesional de Tareas</title>
+  
+  <?php echo getThemeStyles(); ?>
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="pwa/manifest.json">
@@ -175,7 +178,7 @@ function esc($s) {
       <span style="font-size: 1.2rem;">⏳</span>
       <span class="btn-text">Pendientes</span>
     </a>
-    <a class="btn" href="tasks/projects.php" title="Ver proyectos" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
+    <a class="btn" href="tasks/projects.php" title="Ver proyectos" style="background: linear-gradient(135deg, #51ad70ff 0%, #8e44ad 100%);">
       <span style="font-size: 1.2rem;">📁</span>
       <span class="btn-text">Proyectos</span>
     </a>

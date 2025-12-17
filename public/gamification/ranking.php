@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/db.php';
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../services/GamificationService.php';
+require_once __DIR__ . '/../../src/theme.php';
 
 if (!isset($_SESSION['user_id'])) {
   header('Location: ../auth/login.php');
@@ -22,6 +23,7 @@ $current_user_rank = array_search($user_id, array_column($rankings, 'id'));
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <?php echo getThemeStyles(); ?>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ranking | App-Tareas</title>

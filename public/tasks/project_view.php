@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
 require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../src/theme.php';
 
 $pdo = get_pdo();
 $projectService = new ProjectService($pdo);
@@ -33,6 +34,7 @@ function esc($s) {
 <!doctype html>
 <html lang="es">
 <head>
+    <?php echo getThemeStyles(); ?>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo esc($project['name']); ?> | App-Tareas</title>

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../src/theme.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
 require_once __DIR__ . '/../../src/db.php';
 
@@ -19,8 +20,9 @@ function esc($s) {
 <!doctype html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <?php echo getThemeStyles(); ?>
     <title>Proyectos | App-Tareas</title>
     <link rel="stylesheet" href="../../assets/style.css">
     <link rel="stylesheet" href="../../assets/style.css">
