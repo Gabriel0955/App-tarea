@@ -4,6 +4,7 @@ require_once __DIR__ . '/../src/db.php';
 require_once __DIR__ . '/../src/auth.php';
 require_once __DIR__ . '/../services/TaskService.php';
 require_once __DIR__ . '/../services/GamificationService.php';
+require_once __DIR__ . '/../services/ProjectService.php';
 
 $pdo = get_pdo();
 $user_id = get_current_user_id();
@@ -20,6 +21,10 @@ $priority = $_GET['priority'] ?? '';
 
 // Obtener tareas filtradas usando servicio
 $tasks = getTasksFiltered($pdo, $user_id, $search, $filter, $category, $priority);
+
+// Obtener proyectos del usuario para el selector
+$projectService = new ProjectService($pdo);
+$user_projects = $projectService->getUserProjects($user_id);
 
 function esc($s) { 
   return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 
@@ -68,6 +73,30 @@ function esc($s) {
 </head>
 <body>
 <div class="container">
+  <?php if (isset($_GET['success']) && $_GET['success'] === 'task_completed'): ?>
+    <div style="background: var(--accent-green); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.5rem;">✓</span>
+      <span>¡Tarea completada! Has ganado <strong>+<?= intval($_GET['points'] ?? 10) ?> puntos</strong> 🎉</span>
+    </div>
+  <?php endif; ?>
+  
+  <?php if (isset($_GET['error'])): ?>
+    <div style="background: var(--accent-red); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.5rem;">⚠️</span>
+      <span>
+        <?php
+          $error_messages = [
+            'task_not_found' => 'Tarea no encontrada',
+            'requires_production' => 'Esta tarea requiere documentos, usa "Producción" en su lugar',
+            'already_completed' => 'Esta tarea ya está completada',
+            'database_error' => 'Error al completar la tarea'
+          ];
+          echo $error_messages[$_GET['error']] ?? 'Error desconocido';
+        ?>
+      </span>
+    </div>
+  <?php endif; ?>
+  
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
     <div>
       <h1>⚡ App-Tareas</h1>
@@ -88,7 +117,10 @@ function esc($s) {
       <span style="font-size: 1.2rem;">⏳</span>
       <span class="btn-text">Pendientes</span>
     </a>
-
+    <a class="btn" href="tasks/projects.php" title="Ver proyectos" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
+      <span style="font-size: 1.2rem;">📁</span>
+      <span class="btn-text">Proyectos</span>
+    </a>
     <a class="btn" href="tasks/calendar.php" title="Ver calendario de deployments">
       <span style="font-size: 1.2rem;">📅</span>
       <span class="btn-text">Calendario</span>
@@ -322,9 +354,13 @@ function esc($s) {
             <?php elseif ($t['urgency'] === 'Media'): ?><span class="badge media">Media</span>
             <?php else: ?><span class="badge baja">Baja</span><?php endif; ?>
             
-            <!-- Estado de producción -->
+            <!-- Estado de producción o completada -->
             <?php if ($t['deployed']): ?>
-              <span class="badge" style="background: var(--accent-green); font-size: 0.75rem; padding: 4px 8px;">✓ Prod</span>
+              <?php if ($t['requires_docs']): ?>
+                <span class="badge" style="background: var(--accent-green); font-size: 0.75rem; padding: 4px 8px;">✓ Prod</span>
+              <?php else: ?>
+                <span class="badge" style="background: var(--accent-green); font-size: 0.75rem; padding: 4px 8px;">✓ Completada</span>
+              <?php endif; ?>
             <?php endif; ?>
           </div>
         </td>
@@ -341,12 +377,18 @@ function esc($s) {
         </td>
         <td data-label="Acciones">
           <?php if (!$t['deployed']): ?>
-            <?php if ($can_deploy): ?>
-              <a class="btn" href="#" onclick="openDeployModal(<?= $t['id'] ?>); return false;">✅ Producción</a>
+            <?php if ($t['requires_docs']): ?>
+              <!-- Tarea de producción: requiere documentos -->
+              <?php if ($can_deploy): ?>
+                <a class="btn" href="#" onclick="openDeployModal(<?= $t['id'] ?>, true); return false;">✅ Producción</a>
+              <?php else: ?>
+                <a class="btn" href="tasks/edit.php?id=<?= $t['id'] ?>" style="background: var(--accent-yellow); color: #000;" title="Completa los documentos primero">
+                  📋 <?= $completed_docs ?>/4
+                </a>
+              <?php endif; ?>
             <?php else: ?>
-              <a class="btn" href="tasks/edit.php?id=<?= $t['id'] ?>" style="background: var(--accent-yellow); color: #000;" title="Completa los documentos primero">
-                📋 <?= $completed_docs ?>/4
-              </a>
+              <!-- Tarea de proyecto: no requiere documentos, solo marcar como completada -->
+              <a class="btn" href="tasks/mark_completed.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Marcar esta tarea como completada?')" style="background: var(--accent-green);">✓ Completada</a>
             <?php endif; ?>
           <?php endif; ?>
           <a class="btn btn-icon" href="tasks/edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
@@ -374,6 +416,17 @@ function esc($s) {
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div>
+            <label>📁 Proyecto (opcional)</label>
+            <select name="project_id">
+              <option value="">Sin proyecto</option>
+              <?php foreach ($user_projects as $proj): ?>
+                <option value="<?php echo $proj['id']; ?>">
+                  <?php echo esc($proj['icon']); ?> <?php echo esc($proj['name']); ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          <div>
             <label>🏷️ Categoría</label>
             <select name="category">
               <option value="Otro">Otro</option>
@@ -384,6 +437,9 @@ function esc($s) {
               <option value="Feature">Feature</option>
             </select>
           </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div>
             <label>⚡ Prioridad</label>
             <select name="priority">
@@ -393,14 +449,15 @@ function esc($s) {
               <option value="Crítico">🔴 Crítico</option>
             </select>
           </div>
+          <div>
+            <label>⚡ Urgencia</label>
+            <select name="urgency">
+              <option value="Baja">Baja</option>
+              <option value="Media" selected>Media</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
         </div>
-        
-        <label>⚡ Urgencia</label>
-        <select name="urgency">
-          <option value="Baja">Baja</option>
-          <option value="Media" selected>Media</option>
-          <option value="Alta">Alta</option>
-        </select>
         
         <label>📅 Fecha límite (opcional)</label>
         <input type="date" name="due_date">
@@ -440,6 +497,7 @@ function esc($s) {
       </div>
       <form id="deployForm" method="post" action="tasks/mark_deployed.php">
         <input type="hidden" name="id" id="deployTaskId">
+        <input type="hidden" name="requires_docs" id="deployRequiresDocs" value="0">
         
         <div style="background: var(--bg-input); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
           <h3 style="margin: 0 0 12px 0; color: var(--accent-blue);">📋 Checklist Pre-Deployment</h3>
@@ -448,22 +506,22 @@ function esc($s) {
           </p>
           
           <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
-            <input type="checkbox" name="checklist_backup" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <input type="checkbox" name="checklist_backup" value="1" id="checklistBackup" style="margin-right: 10px; width: 18px; height: 18px;">
             <span>💾 Backup realizado</span>
           </label>
           
           <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
-            <input type="checkbox" name="checklist_tests" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <input type="checkbox" name="checklist_tests" value="1" id="checklistTests" style="margin-right: 10px; width: 18px; height: 18px;">
             <span>🧪 Tests ejecutados</span>
           </label>
           
           <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 8px; cursor: pointer;">
-            <input type="checkbox" name="checklist_docs" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <input type="checkbox" name="checklist_docs" value="1" id="checklistDocs" style="margin-right: 10px; width: 18px; height: 18px;">
             <span>📚 Documentación actualizada</span>
           </label>
           
           <label style="display: flex; align-items: center; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; cursor: pointer;">
-            <input type="checkbox" name="checklist_team" value="1" required style="margin-right: 10px; width: 18px; height: 18px;">
+            <input type="checkbox" name="checklist_team" value="1" id="checklistTeam" style="margin-right: 10px; width: 18px; height: 18px;">
             <span>👥 Equipo notificado</span>
           </label>
         </div>
@@ -492,10 +550,32 @@ function closeModal() {
   document.getElementById('taskForm').reset();
   document.getElementById('documentsSection').style.display = 'none';
 }
-
-function openDeployModal(taskId) {
+function openDeployModal(taskId, requiresDocs) {
   document.getElementById('deployTaskId').value = taskId;
+  document.getElementById('deployRequiresDocs').value = requiresDocs ? '1' : '0';
+  
+  // Obtener los checkboxes
+  const checklistBackup = document.getElementById('checklistBackup');
+  const checklistTests = document.getElementById('checklistTests');
+  const checklistDocs = document.getElementById('checklistDocs');
+  const checklistTeam = document.getElementById('checklistTeam');
+  
+  // Si la tarea requiere documentos, hacer los checkboxes obligatorios
+  if (requiresDocs) {
+    checklistBackup.setAttribute('required', 'required');
+    checklistTests.setAttribute('required', 'required');
+    checklistDocs.setAttribute('required', 'required');
+    checklistTeam.setAttribute('required', 'required');
+  } else {
+    // Si no requiere documentos, quitar el required
+    checklistBackup.removeAttribute('required');
+    checklistTests.removeAttribute('required');
+    checklistDocs.removeAttribute('required');
+    checklistTeam.removeAttribute('required');
+  }
+  
   document.getElementById('deployModal').style.display = 'flex';
+} document.getElementById('deployModal').style.display = 'flex';
 }
 
 function closeDeployModal() {

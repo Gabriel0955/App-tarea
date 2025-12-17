@@ -16,6 +16,7 @@ $priority = $_POST['priority'] ?? 'Medio';
 $category = $_POST['category'] ?? 'Otro';
 $due = $_POST['due_date'] ?: null;
 $deployed = isset($_POST['deployed']) && $_POST['deployed'] == '1' ? 1 : 0;
+$project_id = !empty($_POST['project_id']) ? intval($_POST['project_id']) : null;
 
 // Documentos
 $requires_docs = isset($_POST['requires_docs']) && $_POST['requires_docs'] == '1' ? 1 : 0;
@@ -38,6 +39,7 @@ $task_data = [
     'category' => $category,
     'due_date' => $due,
     'deployed' => $deployed,
+    'project_id' => $project_id,
     'requires_docs' => $requires_docs,
     'doc_plan_prueba' => $doc_plan_prueba,
     'doc_plan_produccion' => $doc_plan_produccion,

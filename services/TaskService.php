@@ -67,7 +67,7 @@ function getTasksFiltered($pdo, $user_id, $search = '', $filter = '', $category 
  * Crear nueva tarea
  */
 function createTask($pdo, $user_id, $data) {
-    $stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, priority, category, due_date, deployed, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt = $pdo->prepare('INSERT INTO tasks (user_id, title, description, urgency, priority, category, due_date, deployed, project_id, requires_docs, doc_plan_prueba, doc_plan_produccion, doc_control_objeto, doc_politica_respaldo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     
     return $stmt->execute([
         $user_id,
@@ -78,6 +78,7 @@ function createTask($pdo, $user_id, $data) {
         $data['category'],
         $data['due_date'],
         $data['deployed'],
+        $data['project_id'] ?? null,
         $data['requires_docs'],
         $data['doc_plan_prueba'],
         $data['doc_plan_produccion'],
