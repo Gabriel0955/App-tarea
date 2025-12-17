@@ -200,20 +200,22 @@ function esc($s) {
       </div>
       
       <!-- Últimos Logros -->
-      <div style="display: flex; gap: 8px;">
+      <div style="min-width: 120px; max-width: 200px;">
         <?php if (empty($recent_achievements)): ?>
           <div style="color: #808080; font-size: 12px; text-align: center; padding: 0 16px;">
             ¡Completa tareas<br>para desbloquear<br>logros!
           </div>
         <?php else: ?>
-          <?php foreach ($recent_achievements as $ach): ?>
-            <div title="<?= htmlspecialchars($ach['name']) ?> - Desbloqueado el <?= date('d/m/Y', strtotime($ach['unlocked_at'])) ?>" 
-                 style="width: 50px; height: 50px; background: rgba(15, 17, 23, 0.8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid #00b4d8; cursor: pointer; transition: transform 0.2s ease;"
-                 onmouseover="this.style.transform='scale(1.1)'"
-                 onmouseout="this.style.transform='scale(1)'">
-              <?= $ach['icon'] ?>
-            </div>
-          <?php endforeach; ?>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+            <?php foreach ($recent_achievements as $ach): ?>
+              <div title="<?= htmlspecialchars($ach['name']) ?> - Desbloqueado el <?= date('d/m/Y', strtotime($ach['unlocked_at'])) ?>" 
+                   style="width: 50px; height: 50px; background: rgba(15, 17, 23, 0.8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid #00b4d8; cursor: pointer; transition: transform 0.2s ease; flex-shrink: 0;"
+                   onmouseover="this.style.transform='scale(1.1)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                <?= $ach['icon'] ?>
+              </div>
+            <?php endforeach; ?>
+          </div>
         <?php endif; ?>
       </div>
     </div>

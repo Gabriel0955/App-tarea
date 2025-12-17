@@ -27,6 +27,24 @@ function getUserStats($pdo, $user_id) {
         ];
     }
     
+    // Calcular nivel correcto basado en puntos totales
+    $total_points = $stats['total_points'];
+    $calculated_level = 1;
+    
+    // Calcular nivel: 100 puntos = nivel 2, 300 puntos = nivel 3, etc.
+    while ($total_points >= calculatePointsForLevel($calculated_level + 1)) {
+        $calculated_level++;
+    }
+    
+    // Si el nivel calculado es diferente al guardado, actualizar
+    if ($calculated_level != $stats['current_level']) {
+        $points_needed = calculatePointsForLevel($calculated_level + 1);
+        $stmt = $pdo->prepare("UPDATE user_stats SET current_level = ?, points_to_next_level = ? WHERE user_id = ?");
+        $stmt->execute([$calculated_level, $points_needed, $user_id]);
+        $stats['current_level'] = $calculated_level;
+        $stats['points_to_next_level'] = $points_needed;
+    }
+    
     return $stats;
 }
 
@@ -143,6 +161,17 @@ function getGlobalRanking($pdo, $limit = 50) {
                   LIMIT ?");
     $stmt->execute([$limit]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Calcular puntos necesarios para un nivel
+ */
+function calculatePointsForLevel($level) {
+    // Nivel 1: 0 puntos
+    // Nivel 2: 100 puntos
+    // Nivel 3: 300 puntos (100 * 2 * 1.5)
+    // Nivel 4: 600 puntos
+    return floor(100 * $level * pow(1.5, $level - 1));
 }
 
 /**
