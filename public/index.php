@@ -84,11 +84,14 @@ function esc($s) {
       <span style="font-size: 1.2rem;">📋</span>
       <span class="btn-text">Todas</span>
     </a>
-    <a class="btn" href="index.php?filter=pending" title="Tareas pendientes de producción">
-      <span style="font-size: 1.2rem;">⏳</span>
-      <span class="btn-text">Pendientes</span>
+    <a class="btn" href="projects/projects.php" title="Gestionar proyectos" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+      <span style="font-size: 1.2rem;">📂</span>
+      <span class="btn-text">Proyectos</span>
     </a>
-
+    <a class="btn" href="tasks/quick_tasks.php" title="Tareas rápidas del día" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+      <span style="font-size: 1.2rem;">⚡</span>
+      <span class="btn-text">Rápidas</span>
+    </a>
     <a class="btn" href="tasks/calendar.php" title="Ver calendario de deployments">
       <span style="font-size: 1.2rem;">📅</span>
       <span class="btn-text">Calendario</span>
