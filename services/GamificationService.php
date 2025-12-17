@@ -28,21 +28,34 @@ function getUserStats($pdo, $user_id) {
     }
     
     // Calcular nivel correcto basado en puntos totales
-    $total_points = $stats['total_points'];
+    $total_points = (int)$stats['total_points'];
     $calculated_level = 1;
     
     // Calcular nivel: 100 puntos = nivel 2, 300 puntos = nivel 3, etc.
-    while ($total_points >= calculatePointsForLevel($calculated_level + 1)) {
-        $calculated_level++;
+    // Nivel 1: 0-99 puntos
+    // Nivel 2: 100-299 puntos
+    // Nivel 3: 300+ puntos
+    $cumulative_points = 0;
+    while (true) {
+        $points_for_next_level = (int)floor(100 * $calculated_level * pow(1.5, $calculated_level - 1));
+        if ($total_points >= $cumulative_points + $points_for_next_level) {
+            $cumulative_points += $points_for_next_level;
+            $calculated_level++;
+        } else {
+            break;
+        }
     }
     
-    // Si el nivel calculado es diferente al guardado, actualizar
-    if ($calculated_level != $stats['current_level']) {
-        $points_needed = calculatePointsForLevel($calculated_level + 1);
+    // Calcular puntos necesarios para el siguiente nivel
+    $points_needed_for_next = (int)floor(100 * $calculated_level * pow(1.5, $calculated_level - 1));
+    $cumulative_for_current_level = $cumulative_points;
+    
+    // Si el nivel calculado es diferente al guardado, actualizar inmediatamente
+    if ($calculated_level != (int)$stats['current_level']) {
         $stmt = $pdo->prepare("UPDATE user_stats SET current_level = ?, points_to_next_level = ? WHERE user_id = ?");
-        $stmt->execute([$calculated_level, $points_needed, $user_id]);
+        $stmt->execute([$calculated_level, $cumulative_for_current_level + $points_needed_for_next, $user_id]);
         $stats['current_level'] = $calculated_level;
-        $stats['points_to_next_level'] = $points_needed;
+        $stats['points_to_next_level'] = $cumulative_for_current_level + $points_needed_for_next;
     }
     
     return $stats;
@@ -164,24 +177,44 @@ function getGlobalRanking($pdo, $limit = 50) {
 }
 
 /**
- * Calcular puntos necesarios para un nivel
+ * Calcular puntos necesarios para alcanzar un nivel específico (NO acumulativo, solo para ese nivel)
  */
 function calculatePointsForLevel($level) {
-    // Nivel 1: 0 puntos
-    // Nivel 2: 100 puntos
-    // Nivel 3: 300 puntos (100 * 2 * 1.5)
-    // Nivel 4: 600 puntos
-    return floor(100 * $level * pow(1.5, $level - 1));
+    // Nivel 1->2: 100 puntos
+    // Nivel 2->3: 150 puntos (100 * 1.5)
+    // Nivel 3->4: 225 puntos (150 * 1.5)
+    // etc.
+    if ($level <= 1) return 0;
+    return (int)floor(100 * ($level - 1) * pow(1.5, $level - 2));
 }
 
 /**
- * Calcular progreso de nivel
+ * Calcular progreso de nivel (porcentaje dentro del nivel actual)
  */
 function calculateLevelProgress($total_points, $points_to_next_level) {
-    if ($points_to_next_level <= 0) {
+    // Calcular nivel actual
+    $current_level = 1;
+    $cumulative_points = 0;
+    
+    while (true) {
+        $points_for_next = (int)floor(100 * $current_level * pow(1.5, $current_level - 1));
+        if ($total_points >= $cumulative_points + $points_for_next) {
+            $cumulative_points += $points_for_next;
+            $current_level++;
+        } else {
+            break;
+        }
+    }
+    
+    // Puntos en el nivel actual
+    $points_in_current_level = $total_points - $cumulative_points;
+    $points_needed_for_next = (int)floor(100 * $current_level * pow(1.5, $current_level - 1));
+    
+    if ($points_needed_for_next <= 0) {
         return 100;
     }
-    return min(100, ($total_points / $points_to_next_level) * 100);
+    
+    return min(100, ($points_in_current_level / $points_needed_for_next) * 100);
 }
 
 /**

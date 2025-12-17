@@ -10,6 +10,9 @@ $pdo = get_pdo();
 $user_id = get_current_user_id();
 $username = get_current_username();
 
+// Actualizar estadísticas de gamificación (calcula y actualiza nivel automáticamente)
+$user_stats = getUserStats($pdo, $user_id);
+
 // Estadísticas del dashboard usando servicio
 $stats = getTaskStatistics($pdo, $user_id);
 
@@ -114,7 +117,7 @@ function esc($s) {
       </p>
     </div>
     <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
-      🚺 Salir
+      Salir
     </a>
   </div>
   <div class="top-actions">
@@ -130,10 +133,7 @@ function esc($s) {
       <span style="font-size: 1.2rem;">📁</span>
       <span class="btn-text">Proyectos</span>
     </a>
-    <a class="btn" href="tasks/calendar.php" title="Ver calendario de deployments">
-      <span style="font-size: 1.2rem;">📅</span>
-      <span class="btn-text">Calendario</span>
-    </a>
+
     <a class="btn" href="gamification/pomodoro.php" title="Temporizador Pomodoro y Gamificación" style="background: linear-gradient(135deg, #00c896 0%, #00a878 100%);">
       <span style="font-size: 1.2rem;">🍅</span>
       <span class="btn-text">Pomodoro</span>
@@ -146,9 +146,6 @@ function esc($s) {
 
   <!-- Widget de Gamificación -->
   <?php
-  // Obtener estadísticas de gamificación usando servicio
-  $user_stats = getUserStats($pdo, $user_id);
-  
   // Calcular progreso al siguiente nivel
   $progress_percentage = calculateLevelProgress($user_stats['total_points'], $user_stats['points_to_next_level']);
   
