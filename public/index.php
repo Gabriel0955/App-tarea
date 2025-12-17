@@ -122,15 +122,49 @@ function esc($s) {
   <?php endif; ?>
   
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-    <div>
-      <h1>⚡ App-Tareas</h1>
+    <div style="position: relative;">
+      <h1 style="cursor: pointer; user-select: none;" onclick="toggleThemeDropdown()" title="Click para cambiar tema">⚡ App-Tareas</h1>
+      
+      <!-- Dropdown de temas -->
+      <div id="themeDropdown" style="display: none; position: absolute; top: 100%; left: 0; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 8px; padding: 8px; margin-top: 8px; min-width: 200px; box-shadow: var(--shadow-lg); z-index: 1000;">
+        <div style="padding: 8px 12px; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+          🎨 SELECCIONAR TEMA
+        </div>
+        <div onclick="changeTheme('dark')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">🌙</span>
+          <span style="font-weight: 500;">Oscuro</span>
+        </div>
+        <div onclick="changeTheme('blue')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">🔷</span>
+          <span style="font-weight: 500;">Azul Acero</span>
+        </div>
+        <div onclick="changeTheme('purple')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">⚡</span>
+          <span style="font-weight: 500;">Eléctrico</span>
+        </div>
+        <div onclick="changeTheme('green')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">🎯</span>
+          <span style="font-weight: 500;">Militar</span>
+        </div>
+        <div onclick="changeTheme('red')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">🔥</span>
+          <span style="font-weight: 500;">Fuego</span>
+        </div>
+        <div onclick="changeTheme('gray')" style="padding: 10px 12px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size: 1.2rem;">⚙️</span>
+          <span style="font-weight: 500;">Titanio</span>
+        </div>
+      </div>
+      
       <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem; margin-top: -12px; margin-bottom: 0; font-weight: 400;">
         Bienvenido, <strong style="color: var(--accent-blue);"><?= esc($username) ?></strong>
       </p>
     </div>
-    <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
-      Salir
-    </a>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
+        Salir
+      </a>
+    </div>
   </div>
   <div class="top-actions">
     <a class="btn" href="index.php" title="Ver todas las tareas">
@@ -586,6 +620,81 @@ function esc($s) {
     </div>
   </div>
 
+  <!-- Modal de selección de tema -->
+  <div id="themeModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 style="margin: 0;">🎨 Seleccionar Tema</h2>
+        <button class="modal-close" onclick="closeThemeModal()">&times;</button>
+      </div>
+      <div style="padding: 20px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+          Elige el tema que más te guste. Tu preferencia se guardará automáticamente.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px;">
+          <!-- Tema Oscuro (Default) -->
+          <div class="theme-option" data-theme="dark" onclick="changeTheme('dark')">
+            <div style="background: linear-gradient(135deg, #1a1d29 0%, #2d3561 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              🌙
+            </div>
+            <div style="text-align: center; font-weight: 600;">Oscuro</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Por defecto</div>
+          </div>
+          
+          <!-- Tema Azul Profundo -->
+          <div class="theme-option" data-theme="blue" onclick="changeTheme('blue')">
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              🔷
+            </div>
+            <div style="text-align: center; font-weight: 600;">Azul Acero</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Profesional</div>
+          </div>
+          
+          <!-- Tema Púrpura -->
+          <div class="theme-option" data-theme="purple" onclick="changeTheme('purple')">
+            <div style="background: linear-gradient(135deg, #1e1b4b 0%, #5b21b6 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              ⚡
+            </div>
+            <div style="text-align: center; font-weight: 600;">Electrico</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Energético</div>
+          </div>
+          
+          <!-- Tema Verde Militar -->
+          <div class="theme-option" data-theme="green" onclick="changeTheme('green')">
+            <div style="background: linear-gradient(135deg, #022c22 0%, #065f46 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              🎯
+            </div>
+            <div style="text-align: center; font-weight: 600;">Militar</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Táctico</div>
+          </div>
+          
+          <!-- Tema Rojo Fuego -->
+          <div class="theme-option" data-theme="red" onclick="changeTheme('red')">
+            <div style="background: linear-gradient(135deg, #1f1418 0%, #7f1d1d 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              🔥
+            </div>
+            <div style="text-align: center; font-weight: 600;">Fuego</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Agresivo</div>
+          </div>
+          
+          <!-- Tema Gris Titanio -->
+          <div class="theme-option" data-theme="gray" onclick="changeTheme('gray')">
+            <div style="background: linear-gradient(135deg, #111827 0%, #374151 100%); height: 80px; border-radius: 8px; margin-bottom: 8px; border: 3px solid transparent; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: all 0.3s ease;">
+              ⚙️
+            </div>
+            <div style="text-align: center; font-weight: 600;">Titanio</div>
+            <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted);">Industrial</div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+          ✨ El tema seleccionado se aplicará en toda la aplicación
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal de confirmación para eliminar tarea -->
   <div id="deleteModal" class="modal">
     <div class="modal-content" style="max-width: 500px;">
@@ -745,6 +854,7 @@ window.onclick = function(event) {
   const deployModal = document.getElementById('deployModal');
   const achievementModal = document.getElementById('achievementModal');
   const deleteModal = document.getElementById('deleteModal');
+  const themeModal = document.getElementById('themeModal');
   if (event.target === taskModal) {
     closeModal();
   }
@@ -757,7 +867,130 @@ window.onclick = function(event) {
   if (event.target === deleteModal) {
     closeDeleteModal();
   }
+  if (event.target === themeModal) {
+    closeThemeModal();
+  }
 }
+
+// Sistema de temas
+const themes = {
+  dark: {
+    '--bg-body': '#0f1117',
+    '--bg-card': '#1e2139',
+    '--bg-card-hover': '#252a42',
+    '--primary-gradient-start': '#2d3561',
+    '--primary-gradient-end': '#1a1d29'
+  },
+  blue: {
+    '--bg-body': '#0a0e1a',
+    '--bg-card': '#0f172a',
+    '--bg-card-hover': '#1e293b',
+    '--primary-gradient-start': '#1e3a8a',
+    '--primary-gradient-end': '#0f172a'
+  },
+  purple: {
+    '--bg-body': '#0d0a1a',
+    '--bg-card': '#1e1b4b',
+    '--bg-card-hover': '#2e1c5d',
+    '--primary-gradient-start': '#5b21b6',
+    '--primary-gradient-end': '#1e1b4b'
+  },
+  green: {
+    '--bg-body': '#061412',
+    '--bg-card': '#022c22',
+    '--bg-card-hover': '#064e3b',
+    '--primary-gradient-start': '#065f46',
+    '--primary-gradient-end': '#022c22'
+  },
+  red: {
+    '--bg-body': '#120b0e',
+    '--bg-card': '#1f1418',
+    '--bg-card-hover': '#3f1f27',
+    '--primary-gradient-start': '#7f1d1d',
+    '--primary-gradient-end': '#1f1418'
+  },
+  gray: {
+    '--bg-body': '#0a0c10',
+    '--bg-card': '#111827',
+    '--bg-card-hover': '#1f2937',
+    '--primary-gradient-start': '#374151',
+    '--primary-gradient-end': '#111827'
+  }
+};
+
+window.openThemeModal = function() {
+  const modal = document.getElementById('themeModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    // Marcar el tema actual
+    const currentTheme = localStorage.getItem('appTheme') || 'dark';
+    document.querySelectorAll('.theme-option').forEach(option => {
+      const themeDiv = option.querySelector('div');
+      if (option.dataset.theme === currentTheme) {
+        themeDiv.style.borderColor = 'var(--accent-blue)';
+        themeDiv.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.5)';
+      } else {
+        themeDiv.style.borderColor = 'transparent';
+        themeDiv.style.boxShadow = 'none';
+      }
+    });
+  }
+}
+
+window.closeThemeModal = function() {
+  const modal = document.getElementById('themeModal');
+  if (modal) modal.style.display = 'none';
+}
+
+window.changeTheme = function(themeName) {
+  const theme = themes[themeName];
+  if (!theme) return;
+  
+  // Aplicar colores del tema
+  Object.keys(theme).forEach(property => {
+    document.documentElement.style.setProperty(property, theme[property]);
+  });
+  
+  // Guardar en localStorage
+  localStorage.setItem('appTheme', themeName);
+  
+  // Cerrar dropdown
+  const dropdown = document.getElementById('themeDropdown');
+  if (dropdown) dropdown.style.display = 'none';
+  
+  // Cerrar modal si está abierto
+  closeThemeModal();
+}
+
+// Toggle dropdown de temas
+window.toggleThemeDropdown = function() {
+  const dropdown = document.getElementById('themeDropdown');
+  if (!dropdown) return;
+  
+  if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+    dropdown.style.display = 'block';
+  } else {
+    dropdown.style.display = 'none';
+  }
+}
+
+// Cargar tema guardado al iniciar
+window.addEventListener('DOMContentLoaded', function() {
+  const savedTheme = localStorage.getItem('appTheme') || 'dark';
+  if (savedTheme !== 'dark') {
+    changeTheme(savedTheme);
+  }
+});
+
+// Cerrar dropdown al hacer clic fuera
+document.addEventListener('click', function(event) {
+  const dropdown = document.getElementById('themeDropdown');
+  const appTitle = event.target.closest('h1');
+  
+  if (dropdown && !appTitle && dropdown.style.display === 'block') {
+    dropdown.style.display = 'none';
+  }
+});
 
 window.toggleDocuments = function() {
   const requiresDocs = document.getElementById('requiresDocs');
