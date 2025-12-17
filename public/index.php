@@ -178,7 +178,7 @@ function esc($s) {
       <span style="font-size: 1.2rem;">⏳</span>
       <span class="btn-text">Pendientes</span>
     </a>
-    <a class="btn" href="tasks/projects.php" title="Ver proyectos" style="background: linear-gradient(135deg, #51ad70ff 0%, #8e44ad 100%);">
+    <a class="btn" href="tasks/projects.php" title="Ver proyectos" style="background: linear-gradient(135deg, #51ad70ff 0%, #1eaa8cff 100%);">
       <span style="font-size: 1.2rem;">📁</span>
       <span class="btn-text">Proyectos</span>
     </a>
