@@ -3,9 +3,11 @@ require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
 require_once __DIR__ . '/../../src/db.php';
+
 $pdo = get_pdo();
 $projectService = new ProjectService($pdo);
 $userId = $_SESSION['user_id'];
+$username = $_SESSION['username'] ?? 'Usuario';
 
 $projectId = intval($_GET['id'] ?? 0);
 
@@ -28,76 +30,108 @@ function esc($s) {
     return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 
 }
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo esc($project['name']); ?> - Tareas</title>
+    <title><?php echo esc($project['name']); ?> | App-Tareas</title>
     <link rel="stylesheet" href="../../assets/style.css">
-    <style>
-        .project-view-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .project-header {
-            background: <?php echo esc($project['color']); ?>;
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .project-icon-large {
-            font-size: 64px;
-            background: rgba(255,255,255,0.2);
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 20px;
-        }
-        
-        .project-header-info {
-            flex: 1;
-        }
-        
-        .project-title {
-            font-size: 32px;
-            margin: 0 0 8px 0;
-        }
-        
-        .project-description-header {
-            opacity: 0.9;
-            font-size: 16px;
-            margin: 0;
-        }
-        
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card-large {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .stat-value-large {
-            font-size: 36px;
-            font-weight: bold;
-            color: <?php echo esc($project['color']); ?>;
+</head>
+<body>
+<div class="container">
+  <div class="header-section">
+    <div>
+      <h1><?= esc($project['icon']) ?> <?= esc($project['name']) ?></h1>
+      <?php if ($project['description']): ?>
+        <p class="subtitle"><?= esc($project['description']) ?></p>
+      <?php endif; ?>
+    </div>
+    <a class="btn red" href="projects.php">← Volver a Proyectos</a>
+  </div>
+
+  <!-- Estadísticas del Proyecto -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-number"><?= $stats['total_tasks'] ?></span>
+      <span class="stat-label">Total de Tareas</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number accent-green"><?= $stats['completed_tasks'] ?></span>
+      <span class="stat-label">Completadas</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number accent-orange"><?= $stats['pending_tasks'] ?></span>
+      <span class="stat-label">Pendientes</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-number accent-blue"><?= number_format($stats['completion_percentage'], 1) ?>%</span>
+      <span class="stat-label">Progreso</span>
+    </div>
+  </div>
+
+  <!-- Barra de Progreso -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: <?= $stats['completion_percentage'] ?>%; background: <?= esc($project['color']) ?>;"></div>
+    </div>
+    <span class="progress-text"><?= $stats['completed_tasks'] ?> de <?= $stats['total_tasks'] ?> tareas completadas</span>
+  </div>
+
+  <div class="top-actions">
+    <a class="btn" href="../index.php?project=<?= $projectId ?>">
+      <span>➕</span>
+      <span class="btn-text">Nueva Tarea</span>
+    </a>
+  </div>
+
+  <!-- Lista de Tareas -->
+  <?php if (empty($tasks)): ?>
+    <div class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>No hay tareas en este proyecto</h3>
+      <p>Crea la primera tarea para empezar a trabajar</p>
+    </div>
+  <?php else: ?>
+    <div class="task-grid">
+      <?php foreach ($tasks as $task): ?>
+        <div class="task-card <?= $task['deployed'] ? 'completed' : '' ?>">
+          <div class="task-card-header">
+            <span class="task-priority priority-<?= strtolower($task['urgency'] ?? 'media') ?>">
+              <?= esc($task['urgency'] ?? 'Media') ?>
+            </span>
+            <?php if ($task['category']): ?>
+              <span class="task-category"><?= esc($task['category']) ?></span>
+            <?php endif; ?>
+            <?php if ($task['deployed']): ?>
+              <span class="badge-success">✓ Completada</span>
+            <?php endif; ?>
+          </div>
+
+          <h3 class="task-card-title <?= $task['deployed'] ? 'strikethrough' : '' ?>">
+            <?= esc($task['title']) ?>
+          </h3>
+
+          <?php if ($task['description']): ?>
+            <p class="task-card-description"><?= esc($task['description']) ?></p>
+          <?php endif; ?>
+
+          <?php if ($task['due_date']): ?>
+            <div class="task-meta">
+              <span>📅 Vence: <?= esc($task['due_date']) ?></span>
+            </div>
+          <?php endif; ?>
+
+          <div class="card-actions">
+            <a href="../index.php" class="btn">Ver Detalles</a>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+</div>
+</body>
+</html>
         }
         
         .stat-label-large {

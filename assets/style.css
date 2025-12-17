@@ -1537,4 +1537,260 @@ html {
   }
 }
 
+/* ========================================
+   PROYECTOS - Estilos adicionales
+   ======================================== */
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.stat-box {
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin-bottom: 8px;
+}
+
+.stat-number.accent-green {
+  color: var(--accent-green);
+}
+
+.stat-number.accent-orange {
+  color: var(--accent-orange);
+}
+
+.stat-number.accent-blue {
+  color: var(--accent-blue);
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-container {
+  background: var(--bg-card);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-input);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  transition: width 0.3s ease;
+  border-radius: 6px;
+}
+
+.progress-text {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: var(--spacing-sm);
+}
+
+.card-actions .btn {
+  flex: 1;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin: var(--spacing-sm) 0;
+}
+
+.icon-item {
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  background: var(--bg-input);
+}
+
+.icon-item:hover {
+  background: var(--bg-input-focus);
+  transform: scale(1.1);
+}
+
+.icon-item.selected {
+  border-color: var(--accent-blue);
+  background: var(--bg-input-focus);
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin: var(--spacing-sm) 0;
+}
+
+.color-item {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.color-item:hover {
+  transform: scale(1.1);
+}
+
+.color-item.selected {
+  border-color: var(--text-primary);
+  transform: scale(1.15);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-container {
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+.task-card.completed {
+  opacity: 0.6;
+}
+
+.task-card-title.strikethrough {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-priority {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-baja {
+  background: var(--accent-green);
+  color: white;
+}
+
+.priority-media {
+  background: var(--accent-yellow);
+  color: #000;
+}
+
+.priority-alta {
+  background: var(--accent-red);
+  color: white;
+}
+
+.badge-success {
+  background: var(--accent-green);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+
 
