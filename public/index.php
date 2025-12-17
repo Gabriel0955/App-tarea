@@ -563,10 +563,10 @@ function showNotification(title, body, icon = '⚠️') {
 }
 
 function checkPendingTasks() {
-  const pendingCount = <?= $stats['pendientes'] ?>;
-  const overdueCount = <?= $stats['vencidos'] ?>;
-  const urgentCount = <?= $stats['urgentes'] ?>;
-  const upcomingCount = <?= $stats['proximos'] ?>;
+  const pendingCount = <?= intval($stats['pendientes'] ?? 0) ?>;
+  const overdueCount = <?= intval($stats['vencidos'] ?? 0) ?>;
+  const urgentCount = <?= intval($stats['urgentes'] ?? 0) ?>;
+  const upcomingCount = <?= intval($stats['proximos'] ?? 0) ?>;
   
   // Notificar tareas vencidas (prioridad alta)
   if (overdueCount > 0) {
@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Registrar Service Worker para PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('pwa/sw.js')
       .then(function(registration) {
         console.log('✅ Service Worker registrado:', registration.scope);
       })
