@@ -413,7 +413,7 @@ function esc($s) {
             <?php endif; ?>
           <?php endif; ?>
           <a class="btn btn-icon" href="tasks/edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
-          <a class="btn btn-icon red" href="tasks/delete.php?id=<?= $t['id'] ?>" onclick="return confirmDelete(<?= $t['deployed'] ? 'true' : 'false' ?>)" title="Eliminar">🗑️</a>
+          <a class="btn btn-icon red" href="#" onclick="openDeleteModal(<?= $t['id'] ?>, <?= $t['deployed'] ? 'true' : 'false' ?>, '<?= htmlspecialchars($t['title'], ENT_QUOTES) ?>'); return false;" title="Eliminar">🗑️</a>
         </td>
       </tr>
     <?php endforeach; ?>
@@ -586,6 +586,46 @@ function esc($s) {
     </div>
   </div>
 
+  <!-- Modal de confirmación para eliminar tarea -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 style="margin: 0;">🗑️ Eliminar Tarea</h2>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div style="padding: 20px;">
+        <div id="deleteWarningCompleted" style="display: none; background: rgba(255, 107, 107, 0.2); border: 2px solid var(--accent-red); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+            <span style="font-size: 2rem;">⚠️</span>
+            <strong style="color: var(--accent-red); font-size: 1.1rem;">ADVERTENCIA</strong>
+          </div>
+          <p style="margin: 8px 0; line-height: 1.5;">Esta tarea ya está completada.</p>
+          <ul style="margin: 8px 0 0 20px; line-height: 1.8; color: var(--text-secondary);">
+            <li>❌ Se <strong>RESTARÁN los puntos</strong> que ganaste</li>
+            <li>📉 Tu nivel podría <strong>bajar</strong></li>
+            <li>📊 Se actualizarán tus estadísticas</li>
+          </ul>
+        </div>
+        
+        <p style="color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;">
+          ¿Estás seguro de que deseas eliminar esta tarea?
+        </p>
+        <div style="background: var(--bg-input); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+          <strong id="deleteTaskTitle" style="color: var(--text-primary);"></strong>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+          <button class="btn red" onclick="confirmDeleteTask()" style="flex: 1;">
+            🗑️ Sí, Eliminar
+          </button>
+          <button class="btn" onclick="closeDeleteModal()" style="flex: 1; background: var(--bg-secondary);">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
 // Funciones globales para los modales
 window.openModal = function() {
@@ -657,6 +697,35 @@ window.closeAchievementModal = function() {
   if (modal) modal.style.display = 'none';
 }
 
+// Variables globales para el modal de eliminar
+let deleteTaskId = null;
+
+window.openDeleteModal = function(taskId, isCompleted, taskTitle) {
+  deleteTaskId = taskId;
+  document.getElementById('deleteTaskTitle').textContent = taskTitle;
+  
+  const warningDiv = document.getElementById('deleteWarningCompleted');
+  if (isCompleted) {
+    warningDiv.style.display = 'block';
+  } else {
+    warningDiv.style.display = 'none';
+  }
+  
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+window.closeDeleteModal = function() {
+  const modal = document.getElementById('deleteModal');
+  if (modal) modal.style.display = 'none';
+  deleteTaskId = null;
+}
+
+window.confirmDeleteTask = function() {
+  if (deleteTaskId) {
+    window.location.href = 'tasks/delete.php?id=' + deleteTaskId;
+  }
+}
+
 window.toggleFilters = function() {
   const filtersForm = document.getElementById('filtersForm');
   const filterIcon = document.getElementById('filterIcon');
@@ -675,6 +744,7 @@ window.onclick = function(event) {
   const taskModal = document.getElementById('taskModal');
   const deployModal = document.getElementById('deployModal');
   const achievementModal = document.getElementById('achievementModal');
+  const deleteModal = document.getElementById('deleteModal');
   if (event.target === taskModal) {
     closeModal();
   }
@@ -684,17 +754,8 @@ window.onclick = function(event) {
   if (event.target === achievementModal) {
     closeAchievementModal();
   }
-}
-
-// Confirmación de eliminación con advertencia de puntos
-window.confirmDelete = function(isCompleted) {
-  if (isCompleted) {
-    return confirm('⚠️ ADVERTENCIA: Esta tarea ya está completada.\n\n' +
-                   '❌ Al eliminarla se RESTARÁN los puntos que ganaste.\n' +
-                   '📉 Tu nivel podría bajar si pierdes muchos puntos.\n\n' +
-                   '¿Estás seguro de que deseas eliminar esta tarea?');
-  } else {
-    return confirm('¿Estás seguro de que deseas eliminar esta tarea?');
+  if (event.target === deleteModal) {
+    closeDeleteModal();
   }
 }
 

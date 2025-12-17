@@ -183,7 +183,7 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
     <label style="margin-top: 12px;"><input type="checkbox" name="deployed" value="1" <?= $task['deployed'] ? 'checked' : '' ?>> Ya está en producción</label>
     <div style="margin-top: 16px; display: flex; gap: 10px;">
       <button class="btn" type="submit">💾 Guardar</button>
-      <a class="btn red" href="index.php">✖️ Cancelar</a>
+      <a class="btn red" href="../index.php">✖️ Cancelar</a>
     </div>
   </form>
 </div>
