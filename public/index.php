@@ -92,6 +92,18 @@ function esc($s) {
     </div>
   <?php endif; ?>
   
+  <?php if (isset($_GET['success']) && $_GET['success'] === 'task_deleted'): ?>
+    <div style="background: var(--accent-yellow); color: #000; padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+      <span style="font-size: 1.5rem;">🗑️</span>
+      <span>
+        Tarea eliminada. 
+        <?php if (intval($_GET['points_deducted'] ?? 0) > 0): ?>
+          Se han restado <strong>-<?= intval($_GET['points_deducted']) ?> puntos</strong> 📉
+        <?php endif; ?>
+      </span>
+    </div>
+  <?php endif; ?>
+  
   <?php if (isset($_GET['error'])): ?>
     <div style="background: var(--accent-red); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
       <span style="font-size: 1.5rem;">⚠️</span>
@@ -206,6 +218,7 @@ function esc($s) {
           <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
             <?php foreach ($recent_achievements as $ach): ?>
               <div title="<?= htmlspecialchars($ach['name']) ?> - Desbloqueado el <?= date('d/m/Y', strtotime($ach['unlocked_at'])) ?>" 
+                   onclick="showAchievementInfo('<?= htmlspecialchars($ach['name']) ?>', '<?= htmlspecialchars($ach['description']) ?>', '<?= $ach['icon'] ?>', '<?= date('d/m/Y', strtotime($ach['unlocked_at'])) ?>', <?= $ach['points'] ?>)"
                    style="width: 50px; height: 50px; background: rgba(15, 17, 23, 0.8); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 28px; border: 2px solid #00b4d8; cursor: pointer; transition: transform 0.2s ease; flex-shrink: 0;"
                    onmouseover="this.style.transform='scale(1.1)'"
                    onmouseout="this.style.transform='scale(1)'">
@@ -400,7 +413,7 @@ function esc($s) {
             <?php endif; ?>
           <?php endif; ?>
           <a class="btn btn-icon" href="tasks/edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
-          <a class="btn btn-icon red" href="tasks/delete.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Eliminar esta tarea?')" title="Eliminar">🗑️</a>
+          <a class="btn btn-icon red" href="tasks/delete.php?id=<?= $t['id'] ?>" onclick="return confirmDelete(<?= $t['deployed'] ? 'true' : 'false' ?>)" title="Eliminar">🗑️</a>
         </td>
       </tr>
     <?php endforeach; ?>
@@ -550,6 +563,29 @@ function esc($s) {
     </div>
   </div>
 
+  <!-- Modal de información de logro -->
+  <div id="achievementModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+          <span id="achievementIcon" style="font-size: 2rem;"></span>
+          <span id="achievementName"></span>
+        </h2>
+        <button class="modal-close" onclick="closeAchievementModal()">&times;</button>
+      </div>
+      <div style="padding: 20px;">
+        <p id="achievementDescription" style="color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6;"></p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-input); border-radius: 8px;">
+          <span style="color: var(--text-muted);">Puntos obtenidos</span>
+          <span style="color: var(--accent-green); font-weight: bold; font-size: 1.2rem;">+<span id="achievementPoints"></span> 🏆</span>
+        </div>
+        <div style="margin-top: 12px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+          Desbloqueado el <strong id="achievementDate"></strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
 // Funciones globales para los modales
 window.openModal = function() {
@@ -606,6 +642,21 @@ window.closeDeployModal = function() {
   if (form) form.reset();
 }
 
+// Función para mostrar información de logro
+window.showAchievementInfo = function(name, description, icon, date, points) {
+  document.getElementById('achievementIcon').textContent = icon;
+  document.getElementById('achievementName').textContent = name;
+  document.getElementById('achievementDescription').textContent = description;
+  document.getElementById('achievementPoints').textContent = points;
+  document.getElementById('achievementDate').textContent = date;
+  document.getElementById('achievementModal').style.display = 'flex';
+}
+
+window.closeAchievementModal = function() {
+  const modal = document.getElementById('achievementModal');
+  if (modal) modal.style.display = 'none';
+}
+
 window.toggleFilters = function() {
   const filtersForm = document.getElementById('filtersForm');
   const filterIcon = document.getElementById('filterIcon');
@@ -623,11 +674,27 @@ window.toggleFilters = function() {
 window.onclick = function(event) {
   const taskModal = document.getElementById('taskModal');
   const deployModal = document.getElementById('deployModal');
+  const achievementModal = document.getElementById('achievementModal');
   if (event.target === taskModal) {
     closeModal();
   }
   if (event.target === deployModal) {
     closeDeployModal();
+  }
+  if (event.target === achievementModal) {
+    closeAchievementModal();
+  }
+}
+
+// Confirmación de eliminación con advertencia de puntos
+window.confirmDelete = function(isCompleted) {
+  if (isCompleted) {
+    return confirm('⚠️ ADVERTENCIA: Esta tarea ya está completada.\n\n' +
+                   '❌ Al eliminarla se RESTARÁN los puntos que ganaste.\n' +
+                   '📉 Tu nivel podría bajar si pierdes muchos puntos.\n\n' +
+                   '¿Estás seguro de que deseas eliminar esta tarea?');
+  } else {
+    return confirm('¿Estás seguro de que deseas eliminar esta tarea?');
   }
 }
 

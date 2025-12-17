@@ -103,6 +103,33 @@ function awardPoints($pdo, $user_id, $points, $reason, $source, $reference_id = 
 }
 
 /**
+ * Restar puntos a usuario (cuando se elimina una tarea completada)
+ */
+function deductPoints($pdo, $user_id, $points, $reason, $reference_type = 'task', $reference_id = null) {
+    try {
+        // Restar puntos de user_stats
+        $stmt = $pdo->prepare("UPDATE user_stats SET total_points = GREATEST(0, total_points - ?) WHERE user_id = ?");
+        $stmt->execute([$points, $user_id]);
+        
+        // Registrar en historial con puntos negativos
+        $stmt = $pdo->prepare("INSERT INTO points_history (user_id, points, reason, reference_type, reference_id) 
+                               VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$user_id, -$points, $reason, $reference_type, $reference_id]);
+        
+        // Decrementar contador de tareas completadas si es una tarea
+        if ($reference_type === 'task') {
+            $stmt = $pdo->prepare("UPDATE user_stats SET tasks_completed = GREATEST(0, tasks_completed - 1) WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        error_log("Error restando puntos: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
  * Verificar y desbloquear logros
  */
 function checkAndUnlockAchievements($pdo, $user_id) {
