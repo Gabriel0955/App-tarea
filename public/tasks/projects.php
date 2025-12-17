@@ -42,47 +42,59 @@ function esc($s) {
     </button>
   </div>
 
-  <div class="task-grid">
-    <?php foreach ($projects as $project): ?>
-      <div class="task-card">
-        <div class="task-card-header">
-          <span class="task-emoji"><?= esc($project['icon']) ?></span>
-          <div class="task-card-title-section">
-            <h3 class="task-card-title"><?= esc($project['name']) ?></h3>
+  <?php if (empty($projects)): ?>
+    <div class="empty-state">
+      <div class="empty-icon">📁</div>
+      <h3>No tienes proyectos aún</h3>
+      <p>Crea tu primer proyecto para organizar tus tareas</p>
+      <button class="btn" onclick="openCreateModal()">➕ Crear Proyecto</button>
+    </div>
+  <?php else: ?>
+    <div class="projects-grid-modern">
+      <?php foreach ($projects as $project): ?>
+        <div class="project-card-modern" onclick="window.location.href='project_view.php?id=<?= $project['id'] ?>'">
+          <div class="project-card-accent" style="background: <?= esc($project['color']) ?>;"></div>
+          
+          <div class="project-card-content">
+            <div class="project-icon-wrapper" style="background: <?= esc($project['color']) ?>;">
+              <span class="project-icon-big"><?= esc($project['icon']) ?></span>
+            </div>
+            
+            <h3 class="project-name-modern"><?= esc($project['name']) ?></h3>
+            
             <?php if ($project['description']): ?>
-              <p class="task-card-subtitle"><?= esc($project['description']) ?></p>
+              <p class="project-desc-modern"><?= esc($project['description']) ?></p>
             <?php endif; ?>
+            
+            <div class="project-stats-inline">
+              <div class="stat-inline">
+                <span class="stat-icon">📋</span>
+                <span class="stat-text"><?= $project['stats']['total_tasks'] ?> tareas</span>
+              </div>
+              <div class="stat-inline">
+                <span class="stat-icon">✅</span>
+                <span class="stat-text"><?= $project['stats']['completed_tasks'] ?> completadas</span>
+              </div>
+            </div>
+            
+            <div class="progress-modern">
+              <div class="progress-bar-modern">
+                <div class="progress-fill-modern" style="width: <?= $project['stats']['completion_percentage'] ?>%; background: <?= esc($project['color']) ?>;"></div>
+              </div>
+              <span class="progress-percentage"><?= number_format($project['stats']['completion_percentage'], 0) ?>%</span>
+            </div>
+          </div>
+          
+          <div class="project-card-footer">
+            <span class="project-status-badge">
+              <?= $project['stats']['pending_tasks'] ?> pendientes
+            </span>
+            <span class="project-arrow">→</span>
           </div>
         </div>
-
-        <div class="stats-grid">
-          <div class="stat-box">
-            <span class="stat-number"><?= $project['stats']['total_tasks'] ?></span>
-            <span class="stat-label">Total</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-number accent-green"><?= $project['stats']['completed_tasks'] ?></span>
-            <span class="stat-label">Completadas</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-number accent-orange"><?= $project['stats']['pending_tasks'] ?></span>
-            <span class="stat-label">Pendientes</span>
-          </div>
-        </div>
-
-        <div class="progress-container">
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: <?= $project['stats']['completion_percentage'] ?>%; background: <?= esc($project['color']) ?>;"></div>
-          </div>
-          <span class="progress-text"><?= number_format($project['stats']['completion_percentage'], 1) ?>% completado</span>
-        </div>
-
-        <div class="card-actions">
-          <a href="project_view.php?id=<?= $project['id'] ?>" class="btn">Ver Tareas</a>
-        </div>
-      </div>
-    <?php endforeach; ?>
-  </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 </div>
 
 <!-- Modal crear proyecto -->

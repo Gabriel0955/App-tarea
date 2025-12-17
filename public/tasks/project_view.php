@@ -40,90 +40,136 @@ function esc($s) {
 </head>
 <body>
 <div class="container">
-  <div class="header-section">
-    <div>
-      <h1><?= esc($project['icon']) ?> <?= esc($project['name']) ?></h1>
-      <?php if ($project['description']): ?>
-        <p class="subtitle"><?= esc($project['description']) ?></p>
-      <?php endif; ?>
+  <!-- Header del Proyecto -->
+  <div class="project-header-hero" style="background: linear-gradient(135deg, <?= esc($project['color']) ?> 0%, <?= esc($project['color']) ?>dd 100%);">
+    <div class="project-hero-content">
+      <div class="project-hero-icon"><?= esc($project['icon']) ?></div>
+      <div class="project-hero-info">
+        <h1 class="project-hero-title"><?= esc($project['name']) ?></h1>
+        <?php if ($project['description']): ?>
+          <p class="project-hero-desc"><?= esc($project['description']) ?></p>
+        <?php endif; ?>
+      </div>
     </div>
-    <a class="btn red" href="projects.php">← Volver a Proyectos</a>
+    <a class="btn-back-hero" href="projects.php">← Proyectos</a>
   </div>
 
-  <!-- Estadísticas del Proyecto -->
-  <div class="stats-grid">
-    <div class="stat-box">
-      <span class="stat-number"><?= $stats['total_tasks'] ?></span>
-      <span class="stat-label">Total de Tareas</span>
+  <!-- Estadísticas Destacadas -->
+  <div class="stats-hero-grid">
+    <div class="stat-hero-card">
+      <div class="stat-hero-icon">📋</div>
+      <div class="stat-hero-content">
+        <span class="stat-hero-number"><?= $stats['total_tasks'] ?></span>
+        <span class="stat-hero-label">Total de Tareas</span>
+      </div>
     </div>
-    <div class="stat-box">
-      <span class="stat-number accent-green"><?= $stats['completed_tasks'] ?></span>
-      <span class="stat-label">Completadas</span>
+    <div class="stat-hero-card stat-success">
+      <div class="stat-hero-icon">✅</div>
+      <div class="stat-hero-content">
+        <span class="stat-hero-number"><?= $stats['completed_tasks'] ?></span>
+        <span class="stat-hero-label">Completadas</span>
+      </div>
     </div>
-    <div class="stat-box">
-      <span class="stat-number accent-orange"><?= $stats['pending_tasks'] ?></span>
-      <span class="stat-label">Pendientes</span>
+    <div class="stat-hero-card stat-warning">
+      <div class="stat-hero-icon">⏳</div>
+      <div class="stat-hero-content">
+        <span class="stat-hero-number"><?= $stats['pending_tasks'] ?></span>
+        <span class="stat-hero-label">Pendientes</span>
+      </div>
     </div>
-    <div class="stat-box">
-      <span class="stat-number accent-blue"><?= number_format($stats['completion_percentage'], 1) ?>%</span>
-      <span class="stat-label">Progreso</span>
+    <div class="stat-hero-card stat-primary">
+      <div class="stat-hero-icon">📊</div>
+      <div class="stat-hero-content">
+        <span class="stat-hero-number"><?= number_format($stats['completion_percentage'], 0) ?>%</span>
+        <span class="stat-hero-label">Progreso</span>
+      </div>
     </div>
   </div>
 
-  <!-- Barra de Progreso -->
-  <div class="progress-container">
-    <div class="progress-bar">
-      <div class="progress-fill" style="width: <?= $stats['completion_percentage'] ?>%; background: <?= esc($project['color']) ?>;"></div>
+  <!-- Barra de Progreso Grande -->
+  <div class="progress-hero-container">
+    <div class="progress-hero-header">
+      <span class="progress-hero-title">Progreso General del Proyecto</span>
+      <span class="progress-hero-percentage"><?= number_format($stats['completion_percentage'], 1) ?>%</span>
     </div>
-    <span class="progress-text"><?= $stats['completed_tasks'] ?> de <?= $stats['total_tasks'] ?> tareas completadas</span>
+    <div class="progress-bar-hero">
+      <div class="progress-fill-hero" style="width: <?= $stats['completion_percentage'] ?>%; background: <?= esc($project['color']) ?>;"></div>
+    </div>
+    <div class="progress-hero-footer">
+      <span><?= $stats['completed_tasks'] ?> de <?= $stats['total_tasks'] ?> tareas completadas</span>
+    </div>
   </div>
 
-  <div class="top-actions">
-    <a class="btn" href="../index.php?project=<?= $projectId ?>">
-      <span>➕</span>
-      <span class="btn-text">Nueva Tarea</span>
+  <!-- Acción Nueva Tarea -->
+  <div class="action-section">
+    <a class="btn-action-large" href="../index.php?project=<?= $projectId ?>" style="background: <?= esc($project['color']) ?>;">
+      <span class="btn-action-icon">➕</span>
+      <div class="btn-action-content">
+        <span class="btn-action-title">Nueva Tarea</span>
+        <span class="btn-action-subtitle">Agregar tarea a este proyecto</span>
+      </div>
     </a>
   </div>
 
   <!-- Lista de Tareas -->
+  <div class="tasks-section-header">
+    <h2 class="section-title">📝 Tareas del Proyecto</h2>
+    <span class="task-count-badge"><?= count($tasks) ?> tareas</span>
+  </div>
+
   <?php if (empty($tasks)): ?>
     <div class="empty-state">
       <div class="empty-icon">📝</div>
       <h3>No hay tareas en este proyecto</h3>
-      <p>Crea la primera tarea para empezar a trabajar</p>
+      <p>Crea la primera tarea para empezar a trabajar en este proyecto</p>
+      <a href="../index.php?project=<?= $projectId ?>" class="btn">➕ Crear Primera Tarea</a>
     </div>
   <?php else: ?>
-    <div class="task-grid">
+    <div class="tasks-list-modern">
       <?php foreach ($tasks as $task): ?>
-        <div class="task-card <?= $task['deployed'] ? 'completed' : '' ?>">
-          <div class="task-card-header">
-            <span class="task-priority priority-<?= strtolower($task['urgency'] ?? 'media') ?>">
-              <?= esc($task['urgency'] ?? 'Media') ?>
-            </span>
-            <?php if ($task['category']): ?>
-              <span class="task-category"><?= esc($task['category']) ?></span>
-            <?php endif; ?>
+        <div class="task-item-modern <?= $task['deployed'] ? 'task-completed' : '' ?>">
+          <div class="task-item-check">
             <?php if ($task['deployed']): ?>
-              <span class="badge-success">✓ Completada</span>
+              <span class="check-icon">✓</span>
+            <?php else: ?>
+              <span class="check-empty"></span>
             <?php endif; ?>
           </div>
-
-          <h3 class="task-card-title <?= $task['deployed'] ? 'strikethrough' : '' ?>">
-            <?= esc($task['title']) ?>
-          </h3>
-
-          <?php if ($task['description']): ?>
-            <p class="task-card-description"><?= esc($task['description']) ?></p>
-          <?php endif; ?>
-
-          <?php if ($task['due_date']): ?>
-            <div class="task-meta">
-              <span>📅 Vence: <?= esc($task['due_date']) ?></span>
+          
+          <div class="task-item-content">
+            <h3 class="task-item-title <?= $task['deployed'] ? 'task-title-done' : '' ?>">
+              <?= esc($task['title']) ?>
+            </h3>
+            
+            <?php if ($task['description']): ?>
+              <p class="task-item-desc"><?= esc($task['description']) ?></p>
+            <?php endif; ?>
+            
+            <div class="task-item-meta">
+              <?php if ($task['urgency']): ?>
+                <span class="task-meta-badge badge-urgency-<?= strtolower($task['urgency']) ?>">
+                  <?= esc($task['urgency']) ?>
+                </span>
+              <?php endif; ?>
+              
+              <?php if ($task['category']): ?>
+                <span class="task-meta-badge badge-category">
+                  🏷️ <?= esc($task['category']) ?>
+                </span>
+              <?php endif; ?>
+              
+              <?php if ($task['due_date']): ?>
+                <span class="task-meta-badge badge-date">
+                  📅 <?= esc($task['due_date']) ?>
+                </span>
+              <?php endif; ?>
             </div>
-          <?php endif; ?>
-
-          <div class="card-actions">
-            <a href="../index.php" class="btn">Ver Detalles</a>
+          </div>
+          
+          <div class="task-item-actions">
+            <a href="../index.php#task-<?= $task['id'] ?>" class="btn-task-action">
+              Ver
+            </a>
           </div>
         </div>
       <?php endforeach; ?>

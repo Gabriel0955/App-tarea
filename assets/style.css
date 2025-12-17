@@ -1792,5 +1792,602 @@ html {
   font-weight: 600;
 }
 
+/* ========================================
+   PROYECTOS MODERNOS - Diseño mejorado
+   ======================================== */
+
+.projects-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin-top: var(--spacing-md);
+}
+
+.project-card-modern {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.project-card-modern:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-blue);
+}
+
+.project-card-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-blue);
+}
+
+.project-card-content {
+  padding: 24px;
+}
+
+.project-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: var(--accent-blue);
+  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+}
+
+.project-icon-big {
+  font-size: 32px;
+}
+
+.project-name-modern {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.project-desc-modern {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+  max-height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.project-stats-inline {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.stat-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-input);
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.stat-inline .stat-icon {
+  font-size: 1rem;
+}
+
+.stat-inline .stat-text {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.progress-modern {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar-modern {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill-modern {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+.progress-percentage {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  min-width: 40px;
+  text-align: right;
+}
+
+.project-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--bg-input);
+  border-top: 1px solid var(--border-color);
+}
+
+.project-status-badge {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.project-arrow {
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  transition: transform 0.3s ease;
+}
+
+.project-card-modern:hover .project-arrow {
+  transform: translateX(4px);
+}
+
+.empty-state button {
+  margin-top: 16px;
+}
+
+/* ========================================
+   PROJECT VIEW - Diseño Hero Mejorado
+   ======================================== */
+
+.project-header-hero {
+  position: relative;
+  padding: 40px 32px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.project-header-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.project-hero-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.project-hero-icon {
+  font-size: 72px;
+  background: rgba(255, 255, 255, 0.2);
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.project-hero-info {
+  flex: 1;
+}
+
+.project-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-hero-desc {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  max-width: 600px;
+}
+
+.btn-back-hero {
+  position: relative;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-back-hero:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.stats-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-hero-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.stat-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-blue);
+}
+
+.stat-hero-card.stat-success {
+  border-left: 4px solid var(--accent-green);
+}
+
+.stat-hero-card.stat-warning {
+  border-left: 4px solid var(--accent-orange);
+}
+
+.stat-hero-card.stat-primary {
+  border-left: 4px solid var(--accent-blue);
+}
+
+.stat-hero-icon {
+  font-size: 2rem;
+  opacity: 0.8;
+}
+
+.stat-hero-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-hero-number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-hero-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.progress-hero-container {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.progress-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-hero-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.progress-hero-percentage {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+}
+
+.progress-bar-hero {
+  height: 16px;
+  background: var(--bg-input);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progress-fill-hero {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 10px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.progress-hero-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.action-section {
+  margin-bottom: 32px;
+}
+
+.btn-action-large {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: var(--accent-blue);
+  color: white;
+  padding: 20px 28px;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-action-large:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  filter: brightness(1.1);
+}
+
+.btn-action-icon {
+  font-size: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.btn-action-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.btn-action-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.btn-action-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.tasks-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.task-count-badge {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+}
+
+.tasks-list-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-item-modern {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.task-item-modern:hover {
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
+}
+
+.task-item-modern.task-completed {
+  opacity: 0.6;
+  background: var(--bg-input);
+}
+
+.task-item-check {
+  flex-shrink: 0;
+}
+
+.check-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.check-empty {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  display: block;
+}
+
+.task-item-content {
+  flex: 1;
+}
+
+.task-item-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.task-item-title.task-title-done {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-item-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.task-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.task-meta-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+
+.badge-urgency-alta {
+  background: var(--accent-red);
+  color: white;
+}
+
+.badge-urgency-media {
+  background: var(--accent-yellow);
+  color: #000;
+}
+
+.badge-urgency-baja {
+  background: var(--accent-green);
+  color: white;
+}
+
+.badge-category {
+  background: var(--accent-purple);
+  color: white;
+}
+
+.badge-date {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.task-item-actions {
+  flex-shrink: 0;
+}
+
+.btn-task-action {
+  padding: 8px 20px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.btn-task-action:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+@media (max-width: 768px) {
+  .project-hero-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .project-hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .stats-hero-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .task-item-modern {
+    flex-direction: column;
+  }
+  
+  .task-item-actions {
+    width: 100%;
+  }
+  
+  .btn-task-action {
+    width: 100%;
+    text-align: center;
+  }
+}
 
 
