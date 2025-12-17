@@ -62,14 +62,7 @@ function esc($s) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
-  <title>Calendario | App-Tareas</title>
-  
-  <!-- PWA Meta Tags -->
-  <link rel="manifest" href="../pwa/manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#1e2139">
-  
+  <title>Calendario - App-Tareas</title>
   <link rel="stylesheet" href="../../assets/style.css">
   <style>
     .calendar-container {

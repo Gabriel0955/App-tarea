@@ -64,11 +64,20 @@ function registerUser($pdo, $username, $email, $password) {
     
     // Crear usuario
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING id');
     
     try {
+        $pdo->beginTransaction();
+        
+        // Insertar usuario
+        $stmt = $pdo->prepare('INSERT INTO users (username, email, password) VALUES (?, ?, ?) RETURNING id');
         $stmt->execute([$username, $email, $password_hash]);
         $user_id = $stmt->fetchColumn();
+        
+        // Crear registro en user_stats para gamificación
+        $stmt = $pdo->prepare('INSERT INTO user_stats (user_id, total_points, current_level, points_to_next_level) VALUES (?, 0, 1, 100)');
+        $stmt->execute([$user_id]);
+        
+        $pdo->commit();
         
         return [
             'success' => true,
@@ -76,6 +85,7 @@ function registerUser($pdo, $username, $email, $password) {
             'username' => $username
         ];
     } catch (PDOException $e) {
+        $pdo->rollBack();
         return [
             'success' => false,
             'errors' => ['Error al crear el usuario: ' . $e->getMessage()]
