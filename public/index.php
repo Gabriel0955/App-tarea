@@ -687,6 +687,17 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Verificar cada 30 minutos si hay tareas pendientes
   setInterval(checkPendingTasks, 30 * 60 * 1000);
+  
+  // Si viene desde un proyecto, abrir el modal y preseleccionar el proyecto
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = urlParams.get('project');
+  if (projectId) {
+    openModal();
+    const projectSelect = document.querySelector('select[name="project_id"]');
+    if (projectSelect) {
+      projectSelect.value = projectId;
+    }
+  }
 });
 
 // Registrar Service Worker para PWA
