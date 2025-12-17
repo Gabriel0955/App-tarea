@@ -49,15 +49,21 @@ try {
         $points += 5; // +5 puntos por completar a tiempo
     }
     
-    // Registrar puntos
+    // Registrar puntos en historial
     $stmt = $pdo->prepare("
-        INSERT INTO point_history (user_id, points, description, source_type, source_id, created_at)
+        INSERT INTO points_history (user_id, points, reason, reference_type, reference_id, created_at)
         VALUES (?, ?, ?, 'task_completed', ?, NOW())
     ");
     $stmt->execute([$user_id, $points, 'Tarea de proyecto completada', $task_id]);
     
-    // Actualizar puntos totales del usuario
-    $stmt = $pdo->prepare("UPDATE user_stats SET total_points = total_points + ?, tasks_completed = tasks_completed + 1 WHERE user_id = ?");
+    // Actualizar puntos totales del usuario y tareas completadas
+    $stmt = $pdo->prepare("
+        UPDATE user_stats 
+        SET total_points = total_points + ?, 
+            tasks_completed = tasks_completed + 1,
+            last_activity_date = CURRENT_DATE
+        WHERE user_id = ?
+    ");
     $stmt->execute([$points, $user_id]);
     
     // Actualizar racha

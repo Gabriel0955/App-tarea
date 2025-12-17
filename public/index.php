@@ -23,8 +23,17 @@ $priority = $_GET['priority'] ?? '';
 $tasks = getTasksFiltered($pdo, $user_id, $search, $filter, $category, $priority);
 
 // Obtener proyectos del usuario para el selector
-$projectService = new ProjectService($pdo);
-$user_projects = $projectService->getUserProjects($user_id);
+$user_projects = [];
+try {
+    $projectService = new ProjectService($pdo);
+    $user_projects = $projectService->getUserProjects($user_id, 'all'); // Traer todos los proyectos
+    if ($user_projects === null) {
+        $user_projects = [];
+    }
+} catch (Exception $e) {
+    error_log("Error cargando proyectos: " . $e->getMessage());
+    $user_projects = [];
+}
 
 function esc($s) { 
   return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 
@@ -419,11 +428,13 @@ function esc($s) {
             <label>📁 Proyecto (opcional)</label>
             <select name="project_id">
               <option value="">Sin proyecto</option>
-              <?php foreach ($user_projects as $proj): ?>
-                <option value="<?php echo $proj['id']; ?>">
-                  <?php echo esc($proj['icon']); ?> <?php echo esc($proj['name']); ?>
-                </option>
-              <?php endforeach; ?>
+              <?php if (!empty($user_projects)): ?>
+                <?php foreach ($user_projects as $proj): ?>
+                  <option value="<?php echo $proj['id']; ?>">
+                    <?php echo esc($proj['icon'] ?? '📁'); ?> <?php echo esc($proj['name']); ?>
+                  </option>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </select>
           </div>
           <div>
