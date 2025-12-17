@@ -227,6 +227,63 @@ button.btn {
   animation: pulse 1.5s infinite;
 }
 
+/* Badges de estado de proyecto */
+.badge.badge-endesarrollo {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.badge.badge-enpruebas {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.badge.badge-enproduccion {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.badge.badge-cancelado {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+/* Badges de prioridad de proyecto */
+.badge.priority-alta {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.badge.priority-media {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #d97706;
+  font-weight: 600;
+}
+
+.badge.priority-baja {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Badges de estado de tarea */
+.badge.badge-pendiente {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+}
+
+.badge.badge-enprogreso {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #d97706;
+}
+
+.badge.badge-completada {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #059669;
+}
+
+.badge.badge-bloqueada {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #dc2626;
+}
+
 /* Tabla mejorada */
 table {
   width: 100%;
@@ -1472,6 +1529,11 @@ html {
   
   .top-actions {
     gap: 6px;
+  }
+  
+  /* Responsive para grids de formularios */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
   }
 }
 

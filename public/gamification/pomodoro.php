@@ -30,12 +30,19 @@ $recent_achievements = getRecentAchievements($pdo, $user_id, 5);
 // Calcular progreso al siguiente nivel
 $progress_percentage = calculateLevelProgress($user_stats['total_points'], $user_stats['points_to_next_level']);
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Pomodoro & Gamificación | App-Tareas</title>
+  
+  <!-- PWA Meta Tags -->
+  <link rel="manifest" href="../pwa/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1e2139">
+  
   <link rel="stylesheet" href="../../assets/style.css">
   <style>
     /* Estilos específicos para Pomodoro */
