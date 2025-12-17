@@ -541,16 +541,27 @@ function esc($s) {
   </div>
 
 <script>
-function openModal() {
-  document.getElementById('taskModal').style.display = 'flex';
+// Funciones globales para los modales
+window.openModal = function() {
+  const modal = document.getElementById('taskModal');
+  if (modal) {
+    modal.style.display = 'flex';
+  } else {
+    console.error('Modal taskModal no encontrado');
+  }
 }
 
-function closeModal() {
-  document.getElementById('taskModal').style.display = 'none';
-  document.getElementById('taskForm').reset();
-  document.getElementById('documentsSection').style.display = 'none';
+window.closeModal = function() {
+  const modal = document.getElementById('taskModal');
+  const form = document.getElementById('taskForm');
+  const docsSection = document.getElementById('documentsSection');
+  
+  if (modal) modal.style.display = 'none';
+  if (form) form.reset();
+  if (docsSection) docsSection.style.display = 'none';
 }
-function openDeployModal(taskId, requiresDocs) {
+
+window.openDeployModal = function(taskId, requiresDocs) {
   document.getElementById('deployTaskId').value = taskId;
   document.getElementById('deployRequiresDocs').value = requiresDocs ? '1' : '0';
   
@@ -575,15 +586,17 @@ function openDeployModal(taskId, requiresDocs) {
   }
   
   document.getElementById('deployModal').style.display = 'flex';
-} document.getElementById('deployModal').style.display = 'flex';
 }
 
-function closeDeployModal() {
-  document.getElementById('deployModal').style.display = 'none';
-  document.getElementById('deployForm').reset();
+window.closeDeployModal = function() {
+  const modal = document.getElementById('deployModal');
+  const form = document.getElementById('deployForm');
+  
+  if (modal) modal.style.display = 'none';
+  if (form) form.reset();
 }
 
-function toggleFilters() {
+window.toggleFilters = function() {
   const filtersForm = document.getElementById('filtersForm');
   const filterIcon = document.getElementById('filterIcon');
   
@@ -608,16 +621,15 @@ window.onclick = function(event) {
   }
 }
 
-function toggleDocuments() {
+window.toggleDocuments = function() {
   const requiresDocs = document.getElementById('requiresDocs');
   const docsSection = document.getElementById('documentsSection');
-  const docInputs = docsSection.querySelectorAll('input[type="checkbox"]');
+  const docInputs = docsSection ? docsSection.querySelectorAll('input[type="checkbox"]') : [];
   
-  if (requiresDocs.checked) {
-    docsSection.style.display = 'block';
+  if (requiresDocs && requiresDocs.checked) {
+    if (docsSection) docsSection.style.display = 'block';
   } else {
-    docsSection.style.display = 'none';
-    // Desmarcar todos los documentos si se desactiva
+    if (docsSection) docsSection.style.display = 'none';
     docInputs.forEach(input => input.checked = false);
   }
 }
