@@ -10,13 +10,8 @@ $userId = $_SESSION['user_id'];
 // Obtener fecha seleccionada (hoy por defecto)
 $selectedDate = $_GET['date'] ?? date('Y-m-d');
 
-// Verificar si la tabla existe
-$tableExists = true;
-try {
-    $pdo->query("SELECT 1 FROM quick_tasks LIMIT 1");
-} catch (PDOException $e) {
-    $tableExists = false;
-}
+// Verificar si la tabla existe usando servicio
+$tableExists = $quickTaskService->tableExists();
 
 // Obtener tareas del día solo si la tabla existe
 $tasks = $tableExists ? $quickTaskService->getQuickTasksByDate($userId, $selectedDate) : [];
@@ -33,9 +28,10 @@ $pageTitle = "Tareas Rápidas";
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
     <title><?php echo $pageTitle; ?></title>
     <link rel="stylesheet" href="../../assets/style.css">
+    <?php echo getThemeStyles(); ?>
     <style>
         .quick-tasks-container {
             max-width: 900px;
@@ -48,7 +44,7 @@ $pageTitle = "Tareas Rápidas";
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
-            padding: 15px;
+        }
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -197,6 +193,50 @@ $pageTitle = "Tareas Rápidas";
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .quick-tasks-container {
+                padding: 12px;
+            }
+            
+            .date-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .date-selector input,
+            .date-selector button {
+                width: 100%;
+            }
+            
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .task-item {
+                padding: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .task-item {
+                padding: 10px;
+            }
+            
+            .task-time,
+            .task-actions button {
+                font-size: 0.85rem;
+            }
         }
         
         .stat-card {

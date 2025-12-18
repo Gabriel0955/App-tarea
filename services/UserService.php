@@ -103,15 +103,6 @@ function userExists($pdo, $username, $email) {
 }
 
 /**
- * Obtener usuario por ID
- */
-function getUserById($pdo, $user_id) {
-    $stmt = $pdo->prepare('SELECT id, username, email, created_at FROM users WHERE id = ?');
-    $stmt->execute([$user_id]);
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-/**
  * Obtener usuario por username
  */
 function getUserByUsername($pdo, $username) {
@@ -206,4 +197,113 @@ function isAdmin($pdo, $user_id) {
     $stmt->execute([$user_id]);
     $user = $stmt->fetch();
     return $user && $user['is_admin'];
+}
+
+/**
+ * Obtener todos los usuarios con sus roles y estadísticas
+ */
+function getAllUsersWithRoles($pdo) {
+    $stmt = $pdo->query("
+        SELECT 
+            u.id,
+            u.username,
+            u.email,
+            u.created_at,
+            r.id as role_id,
+            r.name as role_name,
+            r.description as role_description,
+            COALESCE(us.total_points, 0) as total_points,
+            COALESCE(us.current_level, 1) as current_level,
+            COALESCE(us.tasks_completed, 0) as tasks_completed
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        LEFT JOIN user_stats us ON u.id = us.user_id
+        ORDER BY u.id
+    ");
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Obtener todos los roles disponibles
+ */
+function getAllRoles($pdo) {
+    $stmt = $pdo->query("SELECT id, name, description FROM roles ORDER BY id");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Actualizar el rol de un usuario
+ */
+function updateUserRole($pdo, $user_id, $role_id, $current_user_id) {
+    // Validar que no sea el mismo usuario
+    if ($user_id == $current_user_id) {
+        return [
+            'success' => false,
+            'message' => 'No puedes cambiar tu propio rol'
+        ];
+    }
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
+        $stmt->execute([$role_id, $user_id]);
+        
+        return [
+            'success' => true,
+            'message' => 'Rol actualizado correctamente'
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Error al actualizar rol: ' . $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * Obtener estadísticas de usuarios por rol
+ */
+function getUserRoleStats($pdo) {
+    $stmt = $pdo->query("
+        SELECT 
+            r.id,
+            r.name,
+            COUNT(u.id) as user_count
+        FROM roles r
+        LEFT JOIN users u ON r.id = u.role_id
+        GROUP BY r.id, r.name
+        ORDER BY r.id
+    ");
+    
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Obtener información de un usuario específico
+ */
+function getUserById($pdo, $user_id) {
+    $stmt = $pdo->prepare("
+        SELECT 
+            u.id,
+            u.username,
+            u.email,
+            u.created_at,
+            r.id as role_id,
+            r.name as role_name,
+            r.description as role_description
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.id = ?
+    ");
+    
+    $stmt->execute([$user_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
+ * Contar total de usuarios
+ */
+function getTotalUsersCount($pdo) {
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
+    return intval($stmt->fetch(PDO::FETCH_ASSOC)['total']);
 }

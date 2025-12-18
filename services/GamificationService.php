@@ -94,6 +94,83 @@ function updateUserStreak($pdo, $user_id) {
 }
 
 /**
+ * Verificar y desbloquear logros
+ */
+function checkAndUnlockAchievements($pdo, $user_id) {
+    $stmt = $pdo->prepare("SELECT check_and_unlock_achievements(?)");
+    $stmt->execute([$user_id]);
+    return $stmt->fetchColumn();
+}
+
+/**
+ * Completar tarea y otorgar puntos
+ * Usada por mark_completed.php
+ */
+function completeTask($pdo, $user_id, $task_id, $task) {
+    $pdo->beginTransaction();
+    
+    try {
+        // Marcar tarea como completada (deployed = 1)
+        $stmt = $pdo->prepare('UPDATE tasks SET deployed = 1, deployed_at = NOW(), deployed_by = ? WHERE id = ? AND user_id = ?');
+        $stmt->execute([$user_id, $task_id, $user_id]);
+        
+        // Otorgar puntos por completar tarea de proyecto
+        $points = 10; // Puntos base por completar tarea
+        
+        // Bonus si se completa antes de la fecha límite
+        if ($task['due_date'] && strtotime($task['due_date']) >= time()) {
+            $points += 5; // +5 puntos por completar a tiempo
+        }
+        
+        // Registrar puntos en historial
+        $stmt = $pdo->prepare("
+            INSERT INTO points_history (user_id, points, reason, reference_type, reference_id, created_at)
+            VALUES (?, ?, ?, 'task_completed', ?, NOW())
+        ");
+        $stmt->execute([$user_id, $points, 'Tarea de proyecto completada', $task_id]);
+        
+        // Actualizar puntos totales del usuario y tareas completadas
+        $stmt = $pdo->prepare("
+            UPDATE user_stats 
+            SET total_points = total_points + ?, 
+                tasks_completed = tasks_completed + 1,
+                last_activity_date = CURRENT_DATE
+            WHERE user_id = ?
+        ");
+        $stmt->execute([$points, $user_id]);
+        
+        // Actualizar racha
+        updateUserStreak($pdo, $user_id);
+        
+        // Verificar logros
+        checkAndUnlockAchievements($pdo, $user_id);
+        
+        $pdo->commit();
+        
+        return [
+            'success' => true,
+            'points' => $points
+        ];
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        return [
+            'success' => false,
+            'error' => $e->getMessage()
+        ];
+    }
+}
+
+/**
+ * Obtener información de tarea antes de eliminar
+ * Usada por delete.php
+ */
+function getTaskForDeletion($pdo, $task_id, $user_id) {
+    $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ? AND user_id = ?");
+    $stmt->execute([$task_id, $user_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+/**
  * Otorgar puntos a usuario
  */
 function awardPoints($pdo, $user_id, $points, $reason, $source, $reference_id = null) {
@@ -127,15 +204,6 @@ function deductPoints($pdo, $user_id, $points, $reason, $reference_type = 'task'
         error_log("Error restando puntos: " . $e->getMessage());
         return false;
     }
-}
-
-/**
- * Verificar y desbloquear logros
- */
-function checkAndUnlockAchievements($pdo, $user_id) {
-    $stmt = $pdo->prepare("SELECT * FROM check_and_unlock_achievements(?)");
-    $stmt->execute([$user_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /**
@@ -379,4 +447,31 @@ function calculateDeploymentPoints($task_info) {
         'on_time_bonus' => $on_time_bonus,
         'is_on_time' => $is_on_time
     ];
+}
+
+/**
+ * Obtener posición del usuario en el ranking
+ */
+function getUserRankPosition($pdo, $user_id) {
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) + 1 as position
+        FROM user_stats
+        WHERE total_points > (SELECT total_points FROM user_stats WHERE user_id = ?)
+    ");
+    $stmt->execute([$user_id]);
+    return intval($stmt->fetchColumn());
+}
+
+/**
+ * Obtener estadísticas completas del usuario actual
+ */
+function getCurrentUserStats($pdo, $user_id) {
+    $stmt = $pdo->prepare("
+        SELECT us.*, u.username
+        FROM user_stats us
+        JOIN users u ON us.user_id = u.id
+        WHERE us.user_id = ?
+    ");
+    $stmt->execute([$user_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
 }

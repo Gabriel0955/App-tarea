@@ -15,10 +15,8 @@ if ($id <= 0) { header('Location: ../../index.php'); exit; }
 
 $pdo = get_pdo();
 
-// Obtener información de la tarea antes de eliminarla
-$stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ? AND user_id = ?");
-$stmt->execute([$id, $user_id]);
-$task = $stmt->fetch(PDO::FETCH_ASSOC);
+// Obtener información de la tarea antes de eliminarla usando servicio
+$task = getTaskForDeletion($pdo, $id, $user_id);
 
 if (!$task) {
     header('Location: ../../index.php?error=task_not_found'); 

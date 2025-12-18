@@ -158,6 +158,21 @@ function esc($s) {
     }
     
     @media (max-width: 768px) {
+      .calendar-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .calendar-header h2 {
+        order: -1;
+        font-size: 1.5rem;
+      }
+      
+      .calendar-header .btn {
+        width: 100%;
+        max-width: 200px;
+      }
+      
       .calendar-grid {
         gap: 4px;
       }
@@ -167,9 +182,53 @@ function esc($s) {
         padding: 4px;
       }
       
+      .day-number {
+        font-size: 0.9rem;
+      }
+      
       .day-task {
         font-size: 0.65rem;
         padding: 2px 4px;
+      }
+      
+      .calendar-day-header {
+        font-size: 0.75rem;
+        padding: 8px 4px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .calendar-container {
+        padding: 0;
+      }
+      
+      .container {
+        padding: 12px;
+        border-radius: 0;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .calendar-header {
+        padding: 12px;
+      }
+      
+      .calendar-day {
+        min-height: 60px;
+        padding: 2px;
+      }
+      
+      .day-task {
+        font-size: 0.6rem;
+        padding: 1px 3px;
+        margin-bottom: 2px;
+      }
+      
+      .day-number {
+        font-size: 0.8rem;
+        margin-bottom: 4px;
       }
     }
   </style>

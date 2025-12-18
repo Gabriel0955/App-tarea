@@ -4,6 +4,9 @@ require_once __DIR__ . '/../../../src/db.php';
 require_once __DIR__ . '/../../../src/auth.php';
 require_once __DIR__ . '/../../../services/TaskService.php';
 
+// Verificar permiso de creación
+require_permission('tasks', 'create');
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../../index.php'); exit;
 }

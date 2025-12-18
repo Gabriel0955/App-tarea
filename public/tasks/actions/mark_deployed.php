@@ -5,6 +5,9 @@ require_once __DIR__ . '/../../../src/auth.php';
 require_once __DIR__ . '/../../../services/TaskService.php';
 require_once __DIR__ . '/../../../services/GamificationService.php';
 
+// Verificar permiso de actualización
+require_permission('tasks', 'update');
+
 $user_id = get_current_user_id();
 
 // Manejar POST del modal con checklist

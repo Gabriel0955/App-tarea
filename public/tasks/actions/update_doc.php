@@ -4,6 +4,9 @@ require_once __DIR__ . '/../../../src/db.php';
 require_once __DIR__ . '/../../../src/auth.php';
 require_once __DIR__ . '/../../../services/TaskService.php';
 
+// Verificar permiso de actualización
+require_permission('tasks', 'update');
+
 $user_id = get_current_user_id();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

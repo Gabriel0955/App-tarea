@@ -388,21 +388,11 @@ $current_user_rank = array_search($user_id, array_column($rankings, 'id'));
     <!-- Tu Posición (si no está en el top 50) -->
     <?php if ($current_user_rank === false || $current_user_rank >= 50): ?>
       <?php 
-      // Obtener posición exacta del usuario actual
-      $user_position_query = "SELECT COUNT(*) + 1 as position
-                              FROM user_stats
-                              WHERE total_points > (SELECT total_points FROM user_stats WHERE user_id = :user_id)";
-      $stmt = $pdo->prepare($user_position_query);
-      $stmt->execute(['user_id' => $user_id]);
-      $user_position = $stmt->fetchColumn();
+      // Obtener posición exacta del usuario actual usando servicio
+      $user_position = getUserRankPosition($pdo, $user_id);
       
-      $user_stats_query = "SELECT us.*, u.username
-                           FROM user_stats us
-                           JOIN users u ON us.user_id = u.id
-                           WHERE us.user_id = :user_id";
-      $stmt = $pdo->prepare($user_stats_query);
-      $stmt->execute(['user_id' => $user_id]);
-      $current_user_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+      // Obtener estadísticas del usuario usando servicio
+      $current_user_stats = getCurrentUserStats($pdo, $user_id);
       ?>
       
       <div class="ranking-card" style="border: 2px solid #00b4d8;">

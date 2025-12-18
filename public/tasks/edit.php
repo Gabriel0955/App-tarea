@@ -5,6 +5,9 @@ require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../services/TaskService.php';
 require_once __DIR__ . '/../../src/theme.php';
 
+// Verificar permiso de edición
+require_permission('tasks', 'update');
+
 $pdo = get_pdo();
 $user_id = get_current_user_id();
 
@@ -84,6 +87,49 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
   <title>Editar tarea | App-Tareas</title>
   <link rel="stylesheet" href="../../assets/style.css">
   <meta name="theme-color" content="#1e2139">
+  <style>
+    @media (max-width: 768px) {
+      .container {
+        padding: 16px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn-group .btn {
+        width: 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 12px;
+        border-radius: 0;
+      }
+      
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      input, select, textarea {
+        font-size: 16px; /* Evita zoom en iOS */
+      }
+      
+      label {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
   <script>
     function toggleDocuments() {
       const checkbox = document.getElementById('requiresDocs');

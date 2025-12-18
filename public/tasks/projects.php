@@ -5,6 +5,9 @@ require_once __DIR__ . '/../../src/theme.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
 require_once __DIR__ . '/../../src/db.php';
 
+// Verificar permiso de lectura de proyectos
+require_permission('projects', 'read');
+
 $pdo = get_pdo();
 $projectService = new ProjectService($pdo);
 $userId = $_SESSION['user_id'];
@@ -21,11 +24,52 @@ function esc($s) {
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <?php echo getThemeStyles(); ?>
     <title>Proyectos | App-Tareas</title>
     <link rel="stylesheet" href="../../assets/style.css">
-    <link rel="stylesheet" href="../../assets/style.css">
+    <style>
+        @media (max-width: 768px) {
+            .header-section {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+            
+            .header-section .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .project-card {
+                padding: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .project-card {
+                padding: 12px;
+            }
+            
+            .project-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="container">

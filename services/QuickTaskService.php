@@ -13,6 +13,18 @@ class QuickTaskService {
     }
     
     /**
+     * Verificar si la tabla quick_tasks existe
+     */
+    public function tableExists() {
+        try {
+            $this->pdo->query("SELECT 1 FROM quick_tasks LIMIT 1");
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    
+    /**
      * Crear una nueva tarea rápida
      */
     public function createQuickTask($userId, $title, $description = '', $taskDate = null, $scheduledTime = null) {
