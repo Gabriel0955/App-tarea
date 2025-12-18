@@ -190,16 +190,6 @@ function countUsers($pdo) {
 }
 
 /**
- * Verificar si el usuario es administrador
- */
-function isAdmin($pdo, $user_id) {
-    $stmt = $pdo->prepare('SELECT is_admin FROM users WHERE id = ?');
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch();
-    return $user && $user['is_admin'];
-}
-
-/**
  * Obtener todos los usuarios con sus roles y estadísticas
  */
 function getAllUsersWithRoles($pdo) {
