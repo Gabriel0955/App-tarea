@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
 $users = getAllUsersWithRoles($pdo);
 
 // Obtener todos los roles disponibles usando servicio
-$roles = getAllRoles($pdo);
+$roles = getRoles($pdo);
 
 function esc($s) { 
     return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); 

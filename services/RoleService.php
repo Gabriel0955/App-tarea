@@ -72,22 +72,6 @@ function updateUserRole($pdo, $user_id, $role_id, $admin_id) {
 }
 
 /**
- * Obtener usuarios con sus roles
- */
-function getUsersWithRoles($pdo, $admin_id) {
-    // Verificar permisos
-    if (!hasPermission($pdo, $admin_id, 'users', 'read')) {
-        return ['success' => false, 'error' => 'Sin permisos para ver usuarios'];
-    }
-    
-    $stmt = $pdo->query("SELECT * FROM users_with_roles ORDER BY username");
-    return [
-        'success' => true,
-        'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)
-    ];
-}
-
-/**
  * Verificar si un usuario es admin
  */
 function isAdmin($pdo, $user_id) {

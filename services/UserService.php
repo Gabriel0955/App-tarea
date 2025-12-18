@@ -215,42 +215,6 @@ function getAllUsersWithRoles($pdo) {
 }
 
 /**
- * Obtener todos los roles disponibles
- */
-function getAllRoles($pdo) {
-    $stmt = $pdo->query("SELECT id, name, description FROM roles ORDER BY id");
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/**
- * Actualizar el rol de un usuario
- */
-function updateUserRole($pdo, $user_id, $role_id, $current_user_id) {
-    // Validar que no sea el mismo usuario
-    if ($user_id == $current_user_id) {
-        return [
-            'success' => false,
-            'message' => 'No puedes cambiar tu propio rol'
-        ];
-    }
-    
-    try {
-        $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
-        $stmt->execute([$role_id, $user_id]);
-        
-        return [
-            'success' => true,
-            'message' => 'Rol actualizado correctamente'
-        ];
-    } catch (Exception $e) {
-        return [
-            'success' => false,
-            'message' => 'Error al actualizar rol: ' . $e->getMessage()
-        ];
-    }
-}
-
-/**
  * Obtener estadísticas de usuarios por rol
  */
 function getUserRoleStats($pdo) {
