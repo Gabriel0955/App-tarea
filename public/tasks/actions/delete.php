@@ -1,13 +1,17 @@
 <?php
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../src/db.php';
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../services/TaskService.php';
-require_once __DIR__ . '/../../services/GamificationService.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../src/db.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../services/TaskService.php';
+require_once __DIR__ . '/../../../services/GamificationService.php';
+
+// Verificar permiso de eliminación
+require_permission('tasks', 'delete');
+require_once __DIR__ . '/../../../services/GamificationService.php';
 
 $user_id = get_current_user_id();
 $id = intval($_GET['id'] ?? 0);
-if ($id <= 0) { header('Location: ../index.php'); exit; }
+if ($id <= 0) { header('Location: ../../index.php'); exit; }
 
 $pdo = get_pdo();
 
@@ -17,7 +21,7 @@ $stmt->execute([$id, $user_id]);
 $task = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$task) {
-    header('Location: ../index.php?error=task_not_found'); 
+    header('Location: ../../index.php?error=task_not_found'); 
     exit;
 }
 
@@ -43,5 +47,5 @@ if ($task['deployed']) {
 // Eliminar la tarea
 deleteTask($pdo, $id, $user_id);
 
-header('Location: ../index.php?success=task_deleted&points_deducted=' . ($points_to_deduct ?? 0)); 
+header('Location: ../../index.php?success=task_deleted&points_deducted=' . ($points_to_deduct ?? 0)); 
 exit;

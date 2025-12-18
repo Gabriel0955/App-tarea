@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../src/db.php';
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../services/TaskService.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../src/db.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../services/TaskService.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ../index.php'); exit;
+    header('Location: ../../index.php'); exit;
 }
 
 $user_id = get_current_user_id();
@@ -49,4 +49,4 @@ $task_data = [
 
 createTask($pdo, $user_id, $task_data);
 
-header('Location: ../index.php'); exit;
+header('Location: ../../index.php'); exit;

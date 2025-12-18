@@ -107,7 +107,7 @@ function esc($s) {
         <h2 id="modalTitle">➕ Nuevo Proyecto</h2>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <form action="project_api.php" method="post" id="projectForm">
+      <form action="api/project_api.php" method="post" id="projectForm">
         <input type="hidden" name="action" id="formAction" value="create">
         <input type="hidden" name="project_id" id="projectId">
         <input type="hidden" name="color" id="selectedColor" value="#00b4d8">

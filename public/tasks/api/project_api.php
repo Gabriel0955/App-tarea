@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../services/ProjectService.php';
-require_once __DIR__ . '/../../src/db.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../services/ProjectService.php';
+require_once __DIR__ . '/../../../src/db.php';
 header('Content-Type: application/json');
 $pdo = get_pdo();
 $projectService = new ProjectService($pdo);
@@ -18,16 +18,16 @@ switch ($action) {
         $icon = $_POST['icon'] ?? '📁';
         
         if (empty($name)) {
-            header('Location: projects.php?error=name_required');
+            header('Location: ../projects.php?error=name_required');
             exit;
         }
         
         $result = $projectService->createProject($userId, $name, $description, $color, $icon);
         
         if ($result['success']) {
-            header('Location: projects.php?success=project_created');
+            header('Location: ../projects.php?success=project_created');
         } else {
-            header('Location: projects.php?error=create_failed');
+            header('Location: ../projects.php?error=create_failed');
         }
         exit;
         break;

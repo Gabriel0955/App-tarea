@@ -1,22 +1,22 @@
 <?php
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../src/db.php';
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../services/TaskService.php';
-require_once __DIR__ . '/../../services/GamificationService.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../src/db.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../services/TaskService.php';
+require_once __DIR__ . '/../../../services/GamificationService.php';
 
 $user_id = get_current_user_id();
 
 // Manejar POST del modal con checklist
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id'] ?? 0);
-    if ($id <= 0) { header('Location: ../index.php'); exit; }
+    if ($id <= 0) { header('Location: ../../index.php'); exit; }
     
     $pdo = get_pdo();
     
     // Verificar si la tarea puede desplegarse usando servicio
     if (!canTaskBeDeployed($pdo, $id, $user_id)) {
-        header('Location: edit.php?id=' . $id . '&error=docs_incompletos');
+        header('Location: ../edit.php?id=' . $id . '&error=docs_incompletos');
         exit;
     }
     
@@ -65,13 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['new_achievements'] = $gamification_result['achievements'];
     }
     
-    header('Location: ../index.php?deployed=success'); 
+    header('Location: ../../index.php?deployed=success'); 
     exit;
 }
 
 // Manejar GET legacy (sin modal) - redirigir a index para usar modal
 $id = intval($_GET['id'] ?? 0);
-if ($id <= 0) { header('Location: ../index.php'); exit; }
+if ($id <= 0) { header('Location: ../../index.php'); exit; }
 
-header('Location: ../index.php#deploy-' . $id); 
+header('Location: ../../index.php#deploy-' . $id); 
 exit;

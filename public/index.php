@@ -161,9 +161,24 @@ function esc($s) {
       
       <p class="subtitle" style="color: var(--text-secondary); font-size: 1.1rem; margin-top: -12px; margin-bottom: 0; font-weight: 400;">
         Bienvenido, <strong style="color: var(--accent-blue);"><?= esc($username) ?></strong>
+        <span class="badge" style="margin-left: 8px; padding: 3px 10px; font-size: 0.75rem; border-radius: 12px; 
+          <?php 
+            $role = get_current_role();
+            if ($role === 'admin') echo 'background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%); color: white;';
+            elseif ($role === 'manager') echo 'background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%); color: white;';
+            elseif ($role === 'user') echo 'background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;';
+            else echo 'background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white;';
+          ?>">
+          <?= strtoupper($role) ?>
+        </span>
       </p>
     </div>
     <div style="display: flex; gap: 10px; align-items: center;">
+      <?php if (is_admin()): ?>
+        <a class="btn" href="admin/users.php" style="padding: 10px 20px; font-size: 0.9rem; background: linear-gradient(135deg, #ff4757 0%, #ff6348 100%);" title="Administrar usuarios">
+          👥 Usuarios
+        </a>
+      <?php endif; ?>
       <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
         Salir
       </a>
@@ -187,10 +202,12 @@ function esc($s) {
       <span style="font-size: 1.2rem;">🍅</span>
       <span class="btn-text">Pomodoro</span>
     </a>
-    <button class="btn" onclick="openModal()" title="Crear nueva tarea">
-      <span style="font-size: 1.2rem;">➕</span>
-      <span class="btn-text">Nueva</span>
-    </button>
+    <?php if (can('create', 'tasks')): ?>
+      <button class="btn" onclick="openModal()" title="Crear nueva tarea">
+        <span style="font-size: 1.2rem;">➕</span>
+        <span class="btn-text">Nueva</span>
+      </button>
+    <?php endif; ?>
   </div>
 
   <!-- Widget de Gamificación -->
@@ -360,7 +377,7 @@ function esc($s) {
           <!-- Checkboxes de documentos -->
           <?php if ($t['requires_docs']): ?>
             <div style="margin-top: 6px; padding: 4px 6px; background: rgba(0,0,0,0.2); border-radius: 4px; font-size: 0.75rem; line-height: 1.3;">
-              <form method="post" action="tasks/update_doc.php" style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 8px;">
+              <form method="post" action="tasks/actions/update_doc.php" style="margin: 0; display: flex; flex-wrap: wrap; gap: 4px 8px;">
                 <input type="hidden" name="task_id" value="<?= $t['id'] ?>">
                 <label style="display: inline-flex; align-items: center; cursor: pointer; white-space: nowrap;">
                   <input type="checkbox" name="doc_plan_prueba" value="1" <?= $t['doc_plan_prueba'] ? 'checked' : '' ?> onchange="this.form.submit()" style="margin: 0 3px 0 0;">
@@ -446,7 +463,7 @@ function esc($s) {
               <?php endif; ?>
             <?php else: ?>
               <!-- Tarea de proyecto: no requiere documentos, solo marcar como completada -->
-              <a class="btn" href="tasks/mark_completed.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Marcar esta tarea como completada?')" style="background: var(--accent-green);">✓ Completada</a>
+              <a class="btn" href="tasks/actions/mark_completed.php?id=<?= $t['id'] ?>" onclick="return confirm('¿Marcar esta tarea como completada?')" style="background: var(--accent-green);">✓ Completada</a>
             <?php endif; ?>
           <?php endif; ?>
           <a class="btn btn-icon" href="tasks/edit.php?id=<?= $t['id'] ?>" title="Editar">✏️</a>
@@ -465,7 +482,7 @@ function esc($s) {
         <h2 style="margin: 0;">➕ Nueva Tarea</h2>
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
-      <form action="tasks/add.php" method="post" id="taskForm">
+      <form action="tasks/actions/add.php" method="post" id="taskForm">
         <label>Título de la tarea</label>
         <input type="text" name="title" required placeholder="Ej: Implementar nueva funcionalidad">
         
@@ -555,7 +572,7 @@ function esc($s) {
         <h2 style="margin: 0;">✅ Marcar como Desplegado</h2>
         <button class="modal-close" onclick="closeDeployModal()">&times;</button>
       </div>
-      <form id="deployForm" method="post" action="tasks/mark_deployed.php">
+      <form id="deployForm" method="post" action="tasks/actions/mark_deployed.php">
         <input type="hidden" name="id" id="deployTaskId">
         <input type="hidden" name="requires_docs" id="deployRequiresDocs" value="0">
         
@@ -834,7 +851,7 @@ window.closeDeleteModal = function() {
 
 window.confirmDeleteTask = function() {
   if (deleteTaskId) {
-    window.location.href = 'tasks/delete.php?id=' + deleteTaskId;
+    window.location.href = 'tasks/actions/delete.php?id=' + deleteTaskId;
   }
 }
 

@@ -359,7 +359,7 @@ $pageTitle = "Tareas Rápidas";
                 formData.append('date', '<?php echo $selectedDate; ?>');
                 
                 try {
-                    const response = await fetch('quick_tasks_api.php', {
+                    const response = await fetch('api/quick_tasks_api.php', {
                         method: 'POST',
                         body: formData
                     });

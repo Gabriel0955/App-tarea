@@ -1,12 +1,12 @@
 <?php
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../src/db.php';
-require_once __DIR__ . '/../../src/auth.php';
-require_once __DIR__ . '/../../services/TaskService.php';
-require_once __DIR__ . '/../../services/GamificationService.php';
+require_once __DIR__ . '/../../../config.php';
+require_once __DIR__ . '/../../../src/db.php';
+require_once __DIR__ . '/../../../src/auth.php';
+require_once __DIR__ . '/../../../services/TaskService.php';
+require_once __DIR__ . '/../../../services/GamificationService.php';
 
 if (!isset($_GET['id'])) {
-    header('Location: ../index.php');
+    header('Location: ../../index.php');
     exit;
 }
 
@@ -18,19 +18,19 @@ $task_id = intval($_GET['id']);
 $task = getTaskById($pdo, $task_id, $user_id);
 
 if (!$task) {
-    header('Location: ../index.php?error=task_not_found');
+    header('Location: ../../index.php?error=task_not_found');
     exit;
 }
 
 // Verificar que la tarea no requiere documentos (es tarea de proyecto)
 if ($task['requires_docs']) {
-    header('Location: ../index.php?error=requires_production');
+    header('Location: ../../index.php?error=requires_production');
     exit;
 }
 
 // Verificar que no esté ya completada
 if ($task['deployed']) {
-    header('Location: ../index.php?error=already_completed');
+    header('Location: ../../index.php?error=already_completed');
     exit;
 }
 
@@ -76,12 +76,12 @@ try {
     
     $pdo->commit();
     
-    header('Location: ../index.php?success=task_completed&points=' . $points);
+    header('Location: ../../index.php?success=task_completed&points=' . $points);
     exit;
     
 } catch (PDOException $e) {
     $pdo->rollBack();
     error_log("Error al completar tarea: " . $e->getMessage());
-    header('Location: ../index.php?error=database_error');
+    header('Location: ../../index.php?error=database_error');
     exit;
 }
