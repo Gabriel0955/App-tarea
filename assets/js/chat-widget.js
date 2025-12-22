@@ -104,6 +104,10 @@ class ChatWidget {
     this.chatClient.on('message_sent', data => {
       this.handleMessageSent(data);
     });
+    
+    this.chatClient.on('new_message', data => {
+      this.handleNewMessage(data);
+    });
 
     this.chatClient.connect();
   }
@@ -121,11 +125,24 @@ class ChatWidget {
       document.getElementById('chatWidget').classList.add('hidden');
     });
 
-    document.getElementById('chatSendBtn')?.addEventListener('click', () => {
+    const sendBtn = document.getElementById('chatSendBtn');
+    const input = document.getElementById('chatInput');
+
+    sendBtn?.addEventListener('click', () => {
       this.sendMessage();
     });
 
-    document.getElementById('chatInput')?.addEventListener('keydown', e => {
+    input?.addEventListener('input', (e) => {
+      // Habilitar/deshabilitar botón según haya texto
+      const hasText = e.target.value.trim().length > 0;
+      sendBtn.disabled = !hasText;
+      
+      // Auto-resize del textarea
+      e.target.style.height = 'auto';
+      e.target.style.height = e.target.scrollHeight + 'px';
+    });
+
+    input?.addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         this.sendMessage();
@@ -190,16 +207,40 @@ class ChatWidget {
     body.innerHTML = '';
 
     this.messages.forEach(msg => {
-      const div = document.createElement('div');
-      div.textContent = msg.message;
-      body.appendChild(div);
+      const isSent = msg.sender_id === this.userId || msg.senderId === this.userId;
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+      
+      messageDiv.innerHTML = `
+        <div class="chat-message-avatar">
+          ${isSent ? this.username.charAt(0).toUpperCase() : (this.currentChatUser.username || 'U').charAt(0).toUpperCase()}
+        </div>
+        <div class="chat-message-bubble">
+          <p class="chat-message-text">${this.escapeHtml(msg.message)}</p>
+          <span class="chat-message-time">${this.formatTime(msg.created_at || msg.createdAt)}</span>
+        </div>
+      `;
+      
+      body.appendChild(messageDiv);
     });
 
     body.scrollTop = body.scrollHeight;
   }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  formatTime(timestamp) {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  }
 
   sendMessage() {
     const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('chatSendBtn');
     const message = input.value.trim();
 
     if (!message || !this.currentChatUser) return;
@@ -212,6 +253,8 @@ class ChatWidget {
     );
 
     input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
   }
 
   handleNewMessage(data) {
@@ -222,6 +265,30 @@ class ChatWidget {
   handleMessageSent(data) {
     this.messages.push(data);
     this.renderMessages();
+    
+    // Limpiar input
+    const input = document.getElementById('chatInput');
+    if (input) {
+      input.value = '';
+      input.style.height = 'auto';
+    }
+  }
+  
+  handleNewMessage(data) {
+    // Si el mensaje es del chat actual, agregarlo
+    if (this.currentChatUser && 
+        (data.senderId === this.currentChatUser.userId || 
+         data.sender_id === this.currentChatUser.userId)) {
+      this.messages.push(data);
+      this.renderMessages();
+      
+      // Marcar como leído
+      this.chatClient.markAsRead(data.senderId || data.sender_id);
+    } else {
+      // Actualizar contador de no leídos
+      this.unreadCount++;
+      this.updateBadge();
+    }
   }
 
   toggleWidget() {
@@ -230,6 +297,18 @@ class ChatWidget {
       widget.classList.toggle('hidden');
       if (!widget.classList.contains('hidden')) {
         widget.classList.remove('minimized');
+      }
+    }
+  }
+  
+  updateBadge() {
+    const badge = document.getElementById('chatBadge');
+    if (badge) {
+      if (this.unreadCount > 0) {
+        badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
       }
     }
   }

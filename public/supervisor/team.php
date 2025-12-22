@@ -171,7 +171,7 @@ function esc($s) {
 
           <div class="member-meta">
             <span>🔥 Racha: <?= $member['current_streak'] ?> días</span>
-            <span>🍅 Pomodoros: <?= $member['total_pomodoros'] ?></span>
+            <span>🍅 Pomodoros: <?= $member['pomodoros_completed'] ?></span>
           </div>
 
           <div class="member-footer">
@@ -230,12 +230,12 @@ function esc($s) {
         <h2>📝 Notas: <span id="notesMemberName"></span></h2>
         <button class="modal-close" onclick="closeNotesModal()">&times;</button>
       </div>
-      <form action="api/supervisor_api.php" method="post">
+      <form id="notesForm" action="api/supervisor_api.php" method="post">
         <input type="hidden" name="action" value="update_notes">
         <input type="hidden" name="member_id" id="notesMemberId">
         
         <label>Notas sobre este miembro</label>
-        <textarea name="notes" id="notesTextarea" rows="6" placeholder="Escribe notas sobre el desempeño, objetivos, etc..."></textarea>
+        <textarea name="notes" id="memberNotes" rows="6" placeholder="Escribe notas sobre el desempeño, objetivos, etc..."></textarea>
         
         <div class="modal-actions">
           <button class="btn" type="submit">💾 Guardar</button>
