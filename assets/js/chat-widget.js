@@ -155,15 +155,34 @@ class ChatWidget {
 
   async openChat(user) {
     this.currentChatUser = user;
+    
+    // Normalizar el objeto usuario (puede venir de diferentes fuentes)
+    const userId = user.other_user_id || user.id;
+    const username = user.other_username || user.username;
+    const isOnline = user.isOnline !== undefined ? user.isOnline : false;
 
     document.getElementById('chatFooter').style.display = 'block';
-    document.getElementById('chatHeaderTitle').textContent = user.other_username;
+    document.getElementById('chatHeaderTitle').textContent = username;
 
-    const res = await fetch(`/public/api/chat_api.php?action=get_messages&user_id=${user.other_user_id}`);
-    const data = await res.json();
+    try {
+      const res = await fetch(`/public/api/chat_api.php?action=get_messages&user_id=${userId}`);
+      const data = await res.json();
 
-    this.messages = data.messages || [];
-    this.renderMessages();
+      if (data.success) {
+        this.messages = data.messages || [];
+        this.renderMessages();
+        
+        // Guardar el ID normalizado
+        this.currentChatUser.userId = userId;
+        this.currentChatUser.username = username;
+      } else {
+        console.error('Error loading messages:', data.error);
+        alert(data.error || 'Error al cargar mensajes');
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      alert('Error de conexión al cargar mensajes');
+    }
   }
 
   renderMessages() {
@@ -185,8 +204,10 @@ class ChatWidget {
 
     if (!message || !this.currentChatUser) return;
 
+    const receiverId = this.currentChatUser.userId || this.currentChatUser.other_user_id || this.currentChatUser.id;
+
     this.chatClient.sendMessage(
-      this.currentChatUser.other_user_id,
+      receiverId,
       message
     );
 
@@ -201,6 +222,16 @@ class ChatWidget {
   handleMessageSent(data) {
     this.messages.push(data);
     this.renderMessages();
+  }
+
+  toggleWidget() {
+    const widget = document.getElementById('chatWidget');
+    if (widget) {
+      widget.classList.toggle('hidden');
+      if (!widget.classList.contains('hidden')) {
+        widget.classList.remove('minimized');
+      }
+    }
   }
 
   updateConnectionStatus(status, text) {
