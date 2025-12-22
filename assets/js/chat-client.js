@@ -18,59 +18,61 @@ class ChatClient {
   }
 
   // Connect to WebSocket server
-  connect() {
-    console.log('🔌 Connecting to chat server...');
-    
-    this.ws = new WebSocket(this.serverUrl);
-    
-    this.ws.onopen = () => {
-      console.log('✅ Connected to chat server');
-      this.isConnected = true;
-      this.reconnectAttempts = 0;
-      
-      // Authenticate
-      this.send('auth', {
-        userId: this.userId,
-        sessionToken: this.sessionToken
-      });
-      
-      // Start ping interval
-      this.startPing();
-      
-      this.trigger('connected');
-    };
-    
-    this.ws.onmessage = (event) => {
-      try {
-        const { type, payload } = JSON.parse(event.data);
-        this.handleMessage(type, payload);
-      } catch (error) {
-        console.error('❌ Error parsing message:', error);
-      }
-    };
-    
-    this.ws.onclose = () => {
-      console.log('📴 Disconnected from chat server');
-      this.isConnected = false;
-      this.stopPing();
-      this.trigger('disconnected');
-      
-      // Attempt reconnection
-      if (this.reconnectAttempts < this.maxReconnectAttempts) {
-        this.reconnectAttempts++;
-        console.log(`🔄 Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-        setTimeout(() => this.connect(), this.reconnectDelay);
-      } else {
-        console.error('❌ Max reconnection attempts reached');
-        this.trigger('reconnect_failed');
-      }
-    };
-    
-    this.ws.onerror = (error) => {
-      console.error('❌ WebSocket error:', error);
-      this.trigger('error', error);
-    };
-  }
+connect() {
+  console.log('🔌 Connecting to chat server...');
+
+  const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+  const url = this.serverUrl.replace(/^wss?:\/\//, '');
+
+  this.ws = new WebSocket(`${protocol}://${url}`);
+
+  this.ws.onopen = () => {
+    console.log('✅ Connected to chat server');
+    this.isConnected = true;
+    this.reconnectAttempts = 0;
+
+    // Authenticate
+    this.send('auth', {
+      userId: this.userId,
+      sessionToken: this.sessionToken
+    });
+
+    // Start ping interval
+    this.startPing();
+
+    this.trigger('connected');
+  };
+
+  this.ws.onmessage = (event) => {
+    try {
+      const { type, payload } = JSON.parse(event.data);
+      this.handleMessage(type, payload);
+    } catch (error) {
+      console.error('❌ Error parsing message:', error);
+    }
+  };
+
+  this.ws.onclose = () => {
+    console.log('📴 Disconnected from chat server');
+    this.isConnected = false;
+    this.stopPing();
+    this.trigger('disconnected');
+
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`🔄 Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+      setTimeout(() => this.connect(), this.reconnectDelay);
+    } else {
+      console.error('❌ Max reconnection attempts reached');
+      this.trigger('reconnect_failed');
+    }
+  };
+
+  this.ws.onerror = (error) => {
+    console.error('❌ WebSocket error:', error);
+    this.trigger('error', error);
+  };
+}
 
   // Disconnect
   disconnect() {
