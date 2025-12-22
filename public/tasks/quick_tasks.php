@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/QuickTaskService.php';
