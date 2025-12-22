@@ -418,14 +418,19 @@
 @media (max-width: 768px) {
   .chat-widget {
     width: 100%;
-    height: 100%;
-    bottom: 0;
+    height: calc(100% - 80px);
+    bottom: 80px;
     right: 0;
     border-radius: 0;
   }
   
+  .chat-widget.minimized {
+    height: auto;
+    bottom: 90px;
+  }
+  
   .chat-toggle-btn {
-    bottom: 16px;
+    bottom: 90px;
     right: 16px;
     width: 56px;
     height: 56px;

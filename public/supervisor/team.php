@@ -255,6 +255,17 @@ function esc($s) {
 <script src="../../assets/js/chat-widget.js"></script>
 
 <script>
+// Inicializar chat widget
+const chatWidget = new ChatWidget({
+  userId: <?= $userId ?>,
+  username: '<?= esc($username) ?>',
+  sessionToken: '<?= session_id() ?>',
+  wsUrl: '<?= ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) ? 'ws://localhost:8080' : 'wss://socket.integra-code.org' ?>'
+});
+
+// Hacer el widget accesible globalmente
+window.chatWidget = chatWidget;
+
 // Configurar datos del usuario para el chat
 document.body.dataset.userId = '<?= $userId ?>';
 document.body.dataset.username = '<?= esc($username) ?>';

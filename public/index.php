@@ -793,8 +793,11 @@ const chatWidget = new ChatWidget({
   userId: <?= $user_id ?>,
   username: '<?= esc($username) ?>',
   sessionToken: '<?= session_id() ?>',
-  wsUrl: 'ws://20.81.210.24:8080'
+  wsUrl: '<?= ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) ? 'ws://localhost:8080' : 'wss://socket.integra-code.org' ?>'
 });
+
+// Hacer el widget accesible globalmente
+window.chatWidget = chatWidget;
 <?php endif; ?>
 </script>
 

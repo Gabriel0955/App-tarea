@@ -1,5 +1,23 @@
 /* Supervisor Page Styles */
 
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.header-section h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
+}
+
 .team-summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -394,33 +412,94 @@
 @media (max-width: 768px) {
   .team-summary-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .stat-icon {
+    font-size: 1.5rem;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-label {
+    font-size: 0.75rem;
   }
   
   .team-members-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .member-card {
+    padding: 16px;
   }
   
   .member-stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
   
   .member-stats-summary {
     flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tasks-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .tasks-table {
     font-size: 0.85rem;
+    min-width: 600px;
   }
   
   .tasks-table th,
   .tasks-table td {
-    padding: 8px;
+    padding: 8px 6px;
+  }
+  
+  .header-section {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .header-section > div:last-child {
+    width: 100%;
+  }
+  
+  .header-section .btn {
+    flex: 1;
+  }
+  
+  .action-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-box {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+  
   .team-summary-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .stat-card {
+    padding: 12px;
   }
   
   .header-section {
@@ -428,7 +507,47 @@
     gap: 12px;
   }
   
+  .header-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .member-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .member-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.8rem;
+  }
+  
   .member-footer {
     flex-direction: column;
+    gap: 8px;
+  }
+  
+  .member-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .member-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tasks-table {
+    font-size: 0.75rem;
+    min-width: 500px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 }

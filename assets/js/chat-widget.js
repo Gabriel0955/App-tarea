@@ -8,7 +8,7 @@ class ChatWidget {
     this.userId = options.userId;
     this.username = options.username;
     this.sessionToken = options.sessionToken;
-    this.wsUrl = options.wsUrl || 'ws://20.81.210.24:8080';
+    this.wsUrl = options.wsUrl || 'wss://socket.integra-code.org';
     this.containerId = options.containerId || 'chat-widget-container';
     
     this.chatClient = null;
