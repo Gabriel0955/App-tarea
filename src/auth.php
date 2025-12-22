@@ -53,6 +53,11 @@ function is_manager_or_admin() {
     return isset($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'manager']);
 }
 
+// Función para verificar si el usuario actual es supervisor
+function is_supervisor() {
+    return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'supervisor';
+}
+
 // Función para verificar permisos del usuario actual
 function can($action, $resource = 'tasks') {
     $pdo = get_pdo();

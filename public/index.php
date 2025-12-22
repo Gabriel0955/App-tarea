@@ -179,6 +179,11 @@ function esc($s) {
           👥 Usuarios
         </a>
       <?php endif; ?>
+      <?php if (is_supervisor()): ?>
+        <a class="btn" href="supervisor/team.php" style="padding: 10px 20px; font-size: 0.9rem; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);" title="Gestión de equipo">
+          👥 Mi Equipo
+        </a>
+      <?php endif; ?>
       <a class="btn red" href="auth/logout.php" style="padding: 10px 20px; font-size: 0.9rem;" title="Cerrar sesión">
         Salir
       </a>
@@ -202,6 +207,12 @@ function esc($s) {
       <span style="font-size: 1.2rem;">🍅</span>
       <span class="btn-text">Pomodoro</span>
     </a>
+    <?php if (is_supervisor()): ?>
+      <a class="btn" href="supervisor/team.php" title="Ver mi equipo" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+        <span style="font-size: 1.2rem;">👥</span>
+        <span class="btn-text">Mi Equipo</span>
+      </a>
+    <?php endif; ?>
     <?php if (can('create', 'tasks')): ?>
       <button class="btn" onclick="openModal()" title="Crear nueva tarea">
         <span style="font-size: 1.2rem;">➕</span>
@@ -763,6 +774,29 @@ function esc($s) {
 <button class="fab-mobile" onclick="openModal()" style="display: none;" title="Crear nueva tarea">
   ➕
 </button>
+
+<!-- Chat Widget Container -->
+<div id="chat-widget-container"></div>
+
+<!-- Chat System -->
+<link rel="stylesheet" href="../assets/css/chat.css">
+<script src="../assets/js/chat-client.js"></script>
+<script src="../assets/js/chat-widget.js"></script>
+<script>
+// Inicializar chat si es supervisor o tiene miembros
+<?php
+require_once __DIR__ . '/../services/ChatService.php';
+$chatService = new ChatService($pdo);
+$availableUsers = $chatService->getAvailableChatUsers($user_id);
+if (!empty($availableUsers)): ?>
+const chatWidget = new ChatWidget({
+  userId: <?= $user_id ?>,
+  username: '<?= esc($username) ?>',
+  sessionToken: '<?= session_id() ?>',
+  wsUrl: 'ws://20.81.210.24:8080'
+});
+<?php endif; ?>
+</script>
 
 </body>
 </html>
