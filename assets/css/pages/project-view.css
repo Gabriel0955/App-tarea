@@ -1,0 +1,48 @@
+/* Project View Page Styles */
+
+@media (max-width: 768px) {
+  .project-header-hero {
+    padding: 20px;
+  }
+  
+  .project-hero-icon {
+    font-size: 3rem;
+  }
+  
+  .project-hero-title {
+    font-size: 1.8rem;
+  }
+  
+  .project-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .task-filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .task-filters select,
+  .task-filters button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-hero-icon {
+    font-size: 2.5rem;
+  }
+  
+  .project-hero-title {
+    font-size: 1.5rem;
+  }
+  
+  .project-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 0.85rem;
+  }
+}

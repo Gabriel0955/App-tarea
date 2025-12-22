@@ -36,36 +36,50 @@ switch ($action) {
         $projectId = intval($_POST['project_id'] ?? 0);
         
         if ($projectId <= 0) {
-            echo json_encode(['success' => false, 'error' => 'ID inválido']);
+            header('Location: ../projects.php?error=invalid_id');
+            exit;
+        }
+        
+        $name = trim($_POST['name'] ?? '');
+        
+        if (empty($name)) {
+            header('Location: ../projects.php?error=name_required');
             exit;
         }
         
         $data = [
-            'name' => trim($_POST['name'] ?? ''),
+            'name' => $name,
             'description' => trim($_POST['description'] ?? ''),
             'color' => $_POST['color'] ?? null,
             'icon' => $_POST['icon'] ?? null,
             'status' => $_POST['status'] ?? null
         ];
         
-        // Eliminar campos vacíos
+        // Eliminar campos vacíos (excepto name que es requerido)
         $data = array_filter($data, function($value) {
             return $value !== null && $value !== '';
         });
         
         $result = $projectService->updateProject($projectId, $userId, $data);
-        echo json_encode($result);
+        
+        if ($result['success']) {
+            header('Location: ../projects.php?success=project_updated');
+        } else {
+            header('Location: ../projects.php?error=update_failed');
+        }
+        exit;
         break;
         
     case 'delete':
         $projectId = intval($_POST['project_id'] ?? 0);
+        $deleteTasks = isset($_POST['delete_tasks']) && $_POST['delete_tasks'] === '1';
         
         if ($projectId <= 0) {
             echo json_encode(['success' => false, 'error' => 'ID inválido']);
             exit;
         }
         
-        $result = $projectService->deleteProject($projectId, $userId);
+        $result = $projectService->deleteProject($projectId, $userId, $deleteTasks);
         echo json_encode($result);
         break;
         

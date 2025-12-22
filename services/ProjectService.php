@@ -199,23 +199,50 @@ class ProjectService {
     
     /**
      * Eliminar proyecto
+     * @param bool $deleteTasks - Si true, elimina las tareas asociadas. Si false, solo desvincula.
      */
-    public function deleteProject($projectId, $userId) {
+    public function deleteProject($projectId, $userId, $deleteTasks = false) {
         try {
-            // Las tareas no se eliminan, solo se desvinculan (project_id = NULL por ON DELETE SET NULL)
+            $this->pdo->beginTransaction();
+            
+            if ($deleteTasks) {
+                // Eliminar todas las tareas del proyecto
+                $stmt = $this->pdo->prepare("
+                    DELETE FROM tasks 
+                    WHERE project_id = :project_id AND user_id = :user_id
+                ");
+                $stmt->execute([
+                    ':project_id' => $projectId,
+                    ':user_id' => $userId
+                ]);
+            } else {
+                // Solo desvincular tareas (project_id = NULL)
+                $stmt = $this->pdo->prepare("
+                    UPDATE tasks 
+                    SET project_id = NULL 
+                    WHERE project_id = :project_id AND user_id = :user_id
+                ");
+                $stmt->execute([
+                    ':project_id' => $projectId,
+                    ':user_id' => $userId
+                ]);
+            }
+            
+            // Eliminar el proyecto
             $stmt = $this->pdo->prepare("
                 DELETE FROM projects 
                 WHERE id = :project_id AND user_id = :user_id
             ");
-            
             $stmt->execute([
                 ':project_id' => $projectId,
                 ':user_id' => $userId
             ]);
             
+            $this->pdo->commit();
             return ['success' => true];
             
         } catch (PDOException $e) {
+            $this->pdo->rollBack();
             error_log("Error eliminando proyecto: " . $e->getMessage());
             return ['success' => false, 'error' => 'Error al eliminar proyecto'];
         }

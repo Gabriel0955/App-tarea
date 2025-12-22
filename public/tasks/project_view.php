@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../services/ProjectService.php';
@@ -39,54 +39,7 @@ function esc($s) {
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
     <title><?php echo esc($project['name']); ?> | App-Tareas</title>
     <link rel="stylesheet" href="../../assets/style.css">
-    <style>
-        @media (max-width: 768px) {
-            .project-header-hero {
-                padding: 20px;
-            }
-            
-            .project-hero-icon {
-                font-size: 3rem;
-            }
-            
-            .project-hero-title {
-                font-size: 1.8rem;
-            }
-            
-            .project-stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-            
-            .task-filters {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .task-filters select,
-            .task-filters button {
-                width: 100%;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .project-hero-icon {
-                font-size: 2.5rem;
-            }
-            
-            .project-hero-title {
-                font-size: 1.5rem;
-            }
-            
-            .project-stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            table {
-                font-size: 0.85rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/pages/project-view.css">
 </head>
 <body>
 <div class="container">

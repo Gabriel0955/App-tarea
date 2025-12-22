@@ -1,0 +1,397 @@
+/* Pomodoro Page Styles */
+
+/* Estilos específicos para Pomodoro */
+.pomodoro-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.pomodoro-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Timer principal */
+.timer-card {
+  background: rgba(30, 33, 57, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.timer-display {
+  font-size: 120px;
+  font-weight: 700;
+  color: #00b4d8;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin: 30px 0;
+  text-shadow: 0 4px 20px rgba(0, 180, 216, 0.4);
+  font-family: 'Courier New', monospace;
+}
+
+.timer-label {
+  font-size: 24px;
+  color: #b0b0b0;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.timer-btn {
+  padding: 16px 32px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.timer-btn.start {
+  background: linear-gradient(135deg, #00c896 0%, #00a878 100%);
+  color: white;
+}
+
+.timer-btn.pause {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  color: #1e2139;
+}
+
+.timer-btn.reset {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+}
+
+.timer-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+}
+
+.timer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Configuración del timer */
+.timer-settings {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.setting-group label {
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.setting-group input[type="number"] {
+  width: 80px;
+  padding: 8px;
+  background: rgba(15, 17, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e0e0e0;
+  text-align: center;
+}
+
+.task-select {
+  width: 100%;
+  padding: 12px;
+  background: rgba(15, 17, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #e0e0e0;
+  margin-top: 16px;
+}
+
+/* Stats card */
+.stats-card {
+  background: rgba(30, 33, 57, 0.95);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.stats-card h3 {
+  color: #00b4d8;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.level-display {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%);
+  border-radius: 50%;
+  font-size: 36px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 20px rgba(0, 180, 216, 0.4);
+}
+
+.level-info {
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.level-info .points {
+  color: #00b4d8;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(15, 17, 23, 0.8);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00c896 0%, #00b4d8 100%);
+  transition: width 0.3s ease;
+  border-radius: 6px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: #b0b0b0;
+  font-size: 14px;
+}
+
+.stat-value {
+  color: #00b4d8;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.streak-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.streak-fire {
+  font-size: 24px;
+  animation: flicker 2s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Achievements */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.achievement-badge {
+  background: rgba(15, 17, 23, 0.8);
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.achievement-badge:hover {
+  border-color: #00b4d8;
+  transform: translateY(-4px);
+}
+
+.achievement-badge.locked {
+  opacity: 0.3;
+}
+
+.achievement-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.achievement-name {
+  font-size: 12px;
+  color: #b0b0b0;
+  font-weight: 600;
+}
+
+.achievement-points {
+  font-size: 14px;
+  color: #00b4d8;
+  margin-top: 4px;
+}
+
+/* History table */
+.history-table {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.history-table th {
+  text-align: left;
+  padding: 12px;
+  color: #b0b0b0;
+  font-size: 12px;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-table td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.completed {
+  background: rgba(0, 200, 150, 0.2);
+  color: #00c896;
+}
+
+.status-badge.interrupted {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .pomodoro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-display {
+    font-size: 80px;
+  }
+
+  .timer-btn {
+    min-width: 100px;
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .timer-display {
+    font-size: 60px;
+  }
+
+  .timer-controls {
+    flex-direction: column;
+  }
+
+  .timer-btn {
+    width: 100%;
+  }
+
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* Animación cuando el timer está activo */
+.timer-card.active {
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 32px rgba(0, 180, 216, 0.4);
+  }
+}
+
+/* Notificación de logro */
+.achievement-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #00b4d8 0%, #0096c7 100%);
+  color: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 180, 216, 0.6);
+  z-index: 10000;
+  transform: translateX(400px);
+  transition: transform 0.5s ease;
+}
+
+.achievement-notification.show {
+  transform: translateX(0);
+}
+
+.achievement-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.achievement-notification-icon {
+  font-size: 48px;
+}
+
+.achievement-notification-text h4 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+}
+
+.achievement-notification-text p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}

@@ -86,64 +86,9 @@ function esc($s) { return htmlspecialchars($s ?? '', ENT_QUOTES, 'UTF-8'); }
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Editar tarea | App-Tareas</title>
   <link rel="stylesheet" href="../../assets/style.css">
+  <link rel="stylesheet" href="../../assets/css/pages/edit.css">
   <meta name="theme-color" content="#1e2139">
-  <style>
-    @media (max-width: 768px) {
-      .container {
-        padding: 16px;
-      }
-      
-      h1 {
-        font-size: 1.5rem;
-      }
-      
-      .form-grid {
-        grid-template-columns: 1fr !important;
-      }
-      
-      .btn-group {
-        flex-direction: column;
-        gap: 10px;
-      }
-      
-      .btn-group .btn {
-        width: 100%;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .container {
-        padding: 12px;
-        border-radius: 0;
-      }
-      
-      h1 {
-        font-size: 1.3rem;
-      }
-      
-      input, select, textarea {
-        font-size: 16px; /* Evita zoom en iOS */
-      }
-      
-      label {
-        font-size: 0.9rem;
-      }
-    }
-  </style>
-  <script>
-    function toggleDocuments() {
-      const checkbox = document.getElementById('requiresDocs');
-      const section = document.getElementById('documentsSection');
-      
-      if (checkbox.checked) {
-        section.style.display = 'block';
-      } else {
-        section.style.display = 'none';
-        // Desmarcar todos los documentos si se deselecciona
-        document.querySelectorAll('#documentsSection input[type="checkbox"]').forEach(cb => cb.checked = false);
-      }
-    }
-  </script>
+  <script defer src="../../assets/js/pages/edit.js"></script>
 </head>
 <body>
 <div class="container">

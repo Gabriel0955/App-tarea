@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../src/auth.php';
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/theme.php';
@@ -28,48 +28,7 @@ function esc($s) {
   <?php echo getThemeStyles(); ?>
     <title>Proyectos | App-Tareas</title>
     <link rel="stylesheet" href="../../assets/style.css">
-    <style>
-        @media (max-width: 768px) {
-            .header-section {
-                flex-direction: column;
-                gap: 12px;
-                text-align: center;
-            }
-            
-            .header-section .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .projects-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            
-            .project-card {
-                padding: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-            
-            .subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .project-card {
-                padding: 12px;
-            }
-            
-            .project-stats {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../../assets/css/pages/projects.css">
 </head>
 <body>
 <div class="container">
@@ -98,10 +57,19 @@ function esc($s) {
   <?php else: ?>
     <div class="projects-grid-modern">
       <?php foreach ($projects as $project): ?>
-        <div class="project-card-modern" onclick="window.location.href='project_view.php?id=<?= $project['id'] ?>'">
+        <div class="project-card-modern">
           <div class="project-card-accent" style="background: <?= esc($project['color']) ?>;"></div>
           
-          <div class="project-card-content">
+          <div class="project-card-actions">
+            <button class="btn-icon-small" onclick="event.stopPropagation(); openEditModal(<?= $project['id'] ?>, '<?= esc($project['name']) ?>', '<?= esc($project['description']) ?>', '<?= esc($project['color']) ?>', '<?= esc($project['icon']) ?>')" title="Editar proyecto">
+              ✏️
+            </button>
+            <button class="btn-icon-small btn-delete" onclick="event.stopPropagation(); openDeleteModal(<?= $project['id'] ?>, '<?= esc($project['name']) ?>', <?= $project['stats']['total_tasks'] ?>)" title="Eliminar proyecto">
+              🗑️
+            </button>
+          </div>
+          
+          <div class="project-card-content" onclick="window.location.href='project_view.php?id=<?= $project['id'] ?>'" style="cursor: pointer;">
             <div class="project-icon-wrapper" style="background: <?= esc($project['color']) ?>;">
               <span class="project-icon-big"><?= esc($project['icon']) ?></span>
             </div>
@@ -204,42 +172,44 @@ function esc($s) {
   </div>
 </div>
 
-<script>
-function openCreateModal() {
-  document.getElementById('modalTitle').textContent = '➕ Nuevo Proyecto';
-  document.getElementById('formAction').value = 'create';
-  document.getElementById('projectForm').reset();
-  document.getElementById('selectedColor').value = '#00b4d8';
-  document.getElementById('selectedIcon').value = '📁';
-  document.querySelectorAll('.icon-item').forEach(el => el.classList.remove('selected'));
-  document.querySelectorAll('.icon-item')[0].classList.add('selected');
-  document.querySelectorAll('.color-item').forEach(el => el.classList.remove('selected'));
-  document.querySelectorAll('.color-item')[0].classList.add('selected');
-  document.getElementById('projectModal').style.display = 'flex';
-}
+<!-- Modal de confirmación de eliminación -->
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+  <div class="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🗑️ Eliminar Proyecto</h2>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      
+      <div style="padding: 20px;">
+        <p style="margin-bottom: 16px;">¿Estás seguro de que deseas eliminar el proyecto <strong id="deleteProjectName"></strong>?</p>
+        
+        <div id="deleteTasksSection" style="background: rgba(255, 152, 0, 0.1); padding: 16px; border-radius: 8px; border: 2px solid #ff9800; margin-bottom: 16px;">
+          <p style="margin: 0 0 12px 0; color: #ff9800; font-weight: bold;">⚠️ Este proyecto tiene <span id="deleteTasksCount"></span> tarea(s) asociada(s)</p>
+          
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 6px;">
+            <input type="checkbox" id="deleteTasksCheckbox" style="width: 20px; height: 20px; cursor: pointer;">
+            <span style="font-weight: 500;">Eliminar también todas las tareas del proyecto</span>
+          </label>
+          
+          <p style="margin: 12px 0 0 0; font-size: 0.85rem; color: var(--text-secondary);">
+            Si no marcas esta opción, las tareas se mantendrán pero quedarán sin proyecto asignado.
+          </p>
+        </div>
+        
+        <div id="deleteNoTasksSection" style="display: none; background: rgba(76, 175, 80, 0.1); padding: 16px; border-radius: 8px; border: 2px solid #4caf50; margin-bottom: 16px;">
+          <p style="margin: 0; color: #4caf50;">✅ Este proyecto no tiene tareas asociadas</p>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn red" onclick="confirmDelete()">🗑️ Eliminar Proyecto</button>
+        <button class="btn" onclick="closeDeleteModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-function closeModal() {
-  document.getElementById('projectModal').style.display = 'none';
-}
-
-function selectColor(color) {
-  document.getElementById('selectedColor').value = color;
-  document.querySelectorAll('.color-item').forEach(el => el.classList.remove('selected'));
-  event.target.classList.add('selected');
-}
-
-function selectIcon(icon) {
-  document.getElementById('selectedIcon').value = icon;
-  document.querySelectorAll('.icon-item').forEach(el => el.classList.remove('selected'));
-  event.target.classList.add('selected');
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById('projectModal');
-  if (event.target === modal) {
-    closeModal();
-  }
-}
-</script>
+<script src="../../assets/js/pages/projects.js"></script>
 </body>
 </html>

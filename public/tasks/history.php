@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/db.php';
 require_once __DIR__ . '/../../src/auth.php';
@@ -50,46 +50,7 @@ function format_action($action) {
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <title>Historial - <?= esc($task['title']) ?></title>
   <link rel="stylesheet" href="../../assets/style.css">
-  <style>
-    @media (max-width: 768px) {
-      .container > div:first-child {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .container > div:first-child > div:last-child {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      table {
-        font-size: 0.85rem;
-      }
-      
-      .timeline-item {
-        padding: 12px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-      
-      .subtitle {
-        font-size: 0.9rem;
-      }
-      
-      .btn {
-        font-size: 0.85rem;
-        padding: 8px 16px;
-      }
-      
-      table {
-        font-size: 0.75rem;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="../../assets/css/pages/history.css">
 </head>
 <body>
 <div class="container">
