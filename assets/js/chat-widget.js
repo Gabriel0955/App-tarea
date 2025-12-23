@@ -177,13 +177,8 @@ class ChatWidget {
     backBtn.style.display = 'none';
 
     if (!data.success || data.conversations.length === 0) {
-      body.innerHTML = `
-        <div class="chat-empty-state">
-          <div class="chat-empty-state-icon">💬</div>
-          <p class="chat-empty-state-text">No tienes conversaciones aún</p>
-          <button onclick="window.chatWidget.showUsersList()" style="margin-top: 12px; padding: 8px 16px; border-radius: 20px; border: none; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; cursor: pointer;">Iniciar chat</button>
-        </div>
-      `;
+      // Si no hay conversaciones, mostrar automáticamente la lista de usuarios
+      this.showUsersList();
       return;
     }
 
@@ -209,44 +204,57 @@ class ChatWidget {
   }
   
   async showUsersList() {
-    const res = await fetch('/public/api/chat_api.php?action=get_available_users');
-    const data = await res.json();
+    try {
+      const res = await fetch('/public/api/chat_api.php?action=get_available_users');
+      const data = await res.json();
+      
+      console.log('📋 Available users:', data);
 
-    const body = document.getElementById('chatBody');
-    const headerTitle = document.getElementById('chatHeaderTitle');
-    const headerSubtitle = document.getElementById('chatHeaderSubtitle');
-    const backBtn = document.getElementById('chatBackBtn');
-    
-    body.innerHTML = '';
-    headerTitle.textContent = 'Nuevo chat';
-    headerSubtitle.textContent = 'Selecciona un usuario';
-    backBtn.style.display = 'block';
+      const body = document.getElementById('chatBody');
+      const headerTitle = document.getElementById('chatHeaderTitle');
+      const headerSubtitle = document.getElementById('chatHeaderSubtitle');
+      const backBtn = document.getElementById('chatBackBtn');
+      
+      body.innerHTML = '';
+      headerTitle.textContent = 'Usuarios';
+      headerSubtitle.textContent = 'Selecciona para chatear';
+      backBtn.style.display = 'block';
 
-    if (!data.success || data.users.length === 0) {
+      if (!data.success || !data.users || data.users.length === 0) {
+        body.innerHTML = `
+          <div class="chat-empty-state">
+            <div class="chat-empty-state-icon">👥</div>
+            <p class="chat-empty-state-text">No hay usuarios disponibles</p>
+          </div>
+        `;
+        return;
+      }
+
+      data.users.forEach(user => {
+        const el = document.createElement('div');
+        el.className = 'chat-conversation-item';
+        el.innerHTML = `
+          <div class="chat-conversation-avatar">
+            ${user.username.charAt(0).toUpperCase()}
+          </div>
+          <div class="chat-conversation-info">
+            <div class="chat-conversation-name">${this.escapeHtml(user.username)}</div>
+            <div class="chat-conversation-preview">${this.escapeHtml(user.role || 'Usuario')}</div>
+          </div>
+        `;
+        el.onclick = () => this.openChat(user);
+        body.appendChild(el);
+      });
+    } catch (error) {
+      console.error('❌ Error loading users:', error);
+      const body = document.getElementById('chatBody');
       body.innerHTML = `
         <div class="chat-empty-state">
-          <div class="chat-empty-state-icon">👥</div>
-          <p class="chat-empty-state-text">No hay usuarios disponibles</p>
+          <div class="chat-empty-state-icon">⚠️</div>
+          <p class="chat-empty-state-text">Error al cargar usuarios</p>
         </div>
       `;
-      return;
     }
-
-    data.users.forEach(user => {
-      const el = document.createElement('div');
-      el.className = 'chat-conversation-item';
-      el.innerHTML = `
-        <div class="chat-conversation-avatar">
-          ${user.username.charAt(0).toUpperCase()}
-        </div>
-        <div class="chat-conversation-info">
-          <div class="chat-conversation-name">${this.escapeHtml(user.username)}</div>
-          <div class="chat-conversation-preview">${this.escapeHtml(user.role || 'Usuario')}</div>
-        </div>
-      `;
-      el.onclick = () => this.openChat(user);
-      body.appendChild(el);
-    });
   }
 
   async openChat(user) {
