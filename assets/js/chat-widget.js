@@ -57,10 +57,13 @@ class ChatWidget {
             </div>
           </div>
           <div>
-            <button id="chatBackBtn" style="display:none">←</button>
-            <button id="chatNewChatBtn" title="Nuevo chat">👥</button>
-            <button id="chatMinimizeBtn">−</button>
-            <button id="chatCloseBtn">×</button>
+            <button id="chatBackBtn" style="display:none" title="Volver">←</button>
+            <button id="chatNewChatBtn" title="💬 Iniciar nueva conversación - Click aquí para ver todos los usuarios" style="position: relative;">
+              👥
+              <span style="position: absolute; top: -4px; right: -4px; background: #ef4444; color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid white;">+</span>
+            </button>
+            <button id="chatMinimizeBtn" title="Minimizar">−</button>
+            <button id="chatCloseBtn" title="Cerrar">×</button>
           </div>
         </div>
 
@@ -201,6 +204,25 @@ class ChatWidget {
       el.onclick = () => this.openChat(conv);
       body.appendChild(el);
     });
+    
+    // Agregar banner para iniciar nuevas conversaciones
+    const newChatBanner = document.createElement('div');
+    newChatBanner.style.cssText = 'padding: 16px; margin: 12px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%); border: 2px dashed rgba(37, 99, 235, 0.3); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease;';
+    newChatBanner.innerHTML = `
+      <div style="font-size: 2rem; margin-bottom: 8px;">👥</div>
+      <div style="font-weight: 600; color: #2563eb; margin-bottom: 4px;">¿Buscas a alguien más?</div>
+      <div style="font-size: 0.9rem; color: #64748b;">Click aquí para ver todos los usuarios disponibles</div>
+    `;
+    newChatBanner.onmouseover = () => {
+      newChatBanner.style.background = 'linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(30, 64, 175, 0.2) 100%)';
+      newChatBanner.style.transform = 'scale(1.02)';
+    };
+    newChatBanner.onmouseout = () => {
+      newChatBanner.style.background = 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%)';
+      newChatBanner.style.transform = 'scale(1)';
+    };
+    newChatBanner.onclick = () => this.showUsersList();
+    body.appendChild(newChatBanner);
   }
   
   async showUsersList() {
