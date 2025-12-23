@@ -17,6 +17,12 @@ class ChatWidget {
     this.typingTimeout = null;
     this.isMinimized = true;
     this.unreadCount = 0;
+    
+    // Sistema de notificaciones
+    this.notificationSound = new Audio('data:audio/wav;base64,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');
+    this.originalTitle = document.title;
+    this.titleBlinkInterval = null;
+    this.requestNotificationPermission();
 
     this.init();
   }
@@ -210,7 +216,6 @@ class ChatWidget {
     newChatBanner.style.cssText = 'padding: 16px; margin: 12px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%); border: 2px dashed rgba(37, 99, 235, 0.3); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s ease;';
     newChatBanner.innerHTML = `
       <div style="font-size: 2rem; margin-bottom: 8px;">👥</div>
-      <div style="font-weight: 600; color: #2563eb; margin-bottom: 4px;">¿Buscas a alguien más?</div>
       <div style="font-size: 0.9rem; color: #64748b;">Click aquí para ver todos los usuarios disponibles</div>
     `;
     newChatBanner.onmouseover = () => {
@@ -367,11 +372,6 @@ class ChatWidget {
     sendBtn.disabled = true;
   }
 
-  handleNewMessage(data) {
-    this.messages.push(data);
-    this.renderMessages();
-  }
-
   handleMessageSent(data) {
     this.messages.push(data);
     this.renderMessages();
@@ -392,12 +392,24 @@ class ChatWidget {
       this.messages.push(data);
       this.renderMessages();
       
-      // Marcar como leído
-      this.chatClient.markAsRead(data.senderId || data.sender_id);
+      // Marcar como leído si la ventana está visible
+      if (!document.hidden) {
+        this.chatClient.markAsRead(data.senderId || data.sender_id);
+      }
     } else {
       // Actualizar contador de no leídos
       this.unreadCount++;
       this.updateBadge();
+      
+      // Notificar al usuario
+      this.showNotification(data);
+      this.playNotificationSound();
+      this.startTitleBlink();
+    }
+    
+    // Recargar lista de conversaciones para actualizar
+    if (!this.currentChatUser) {
+      this.loadConversations();
     }
   }
 
@@ -405,8 +417,15 @@ class ChatWidget {
     const widget = document.getElementById('chatWidget');
     if (widget) {
       widget.classList.toggle('hidden');
+      this.isMinimized = widget.classList.contains('hidden');
+      
       if (!widget.classList.contains('hidden')) {
         widget.classList.remove('minimized');
+        // Detener notificaciones visuales al abrir el chat
+        this.stopTitleBlink();
+        // Resetear contador si se abre el chat
+        this.unreadCount = 0;
+        this.updateBadge();
       }
     }
   }
@@ -429,6 +448,93 @@ class ChatWidget {
     el.className = `chat-connection-status ${status}`;
     if (status === 'connected') {
       setTimeout(() => (el.style.display = 'none'), 2000);
+    }
+  }
+
+  // Solicitar permiso para notificaciones
+  requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  // Reproducir sonido de notificación
+  playNotificationSound() {
+    try {
+      this.notificationSound.play().catch(err => {
+        console.log('No se pudo reproducir el sonido:', err);
+      });
+    } catch (err) {
+      console.log('Error al reproducir sonido:', err);
+    }
+  }
+
+  // Mostrar notificación del navegador
+  showNotification(data) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const senderName = data.senderName || data.sender_name || 'Usuario';
+      const messageText = data.content || data.message || 'Nuevo mensaje';
+      
+      // Truncar mensaje si es muy largo
+      const shortMessage = messageText.length > 100 
+        ? messageText.substring(0, 100) + '...' 
+        : messageText;
+
+      const notification = new Notification(`💬 ${senderName}`, {
+        body: shortMessage,
+        icon: '/assets/icon-192x192.png',
+        badge: '/assets/icon-192x192.png',
+        tag: 'chat-message',
+        requireInteraction: false
+      });
+
+      // Al hacer clic en la notificación, abrir el chat
+      notification.onclick = () => {
+        window.focus();
+        this.toggleWidget();
+        if (this.isMinimized) {
+          this.toggleWidget();
+        }
+        notification.close();
+      };
+
+      // Cerrar automáticamente después de 5 segundos
+      setTimeout(() => notification.close(), 5000);
+    }
+  }
+
+  // Parpadear el título de la página
+  startTitleBlink() {
+    // Detener parpadeo anterior si existe
+    if (this.titleBlinkInterval) {
+      clearInterval(this.titleBlinkInterval);
+    }
+
+    let count = 0;
+    const maxBlinks = 10;
+    
+    this.titleBlinkInterval = setInterval(() => {
+      document.title = count % 2 === 0 
+        ? '🔴 Nuevo mensaje' 
+        : this.originalTitle;
+      
+      count++;
+      
+      // Detener después de 10 parpadeos o si el usuario abre el chat
+      if (count >= maxBlinks || !this.isMinimized) {
+        clearInterval(this.titleBlinkInterval);
+        document.title = this.originalTitle;
+        this.titleBlinkInterval = null;
+      }
+    }, 1000);
+  }
+
+  // Detener parpadeo del título
+  stopTitleBlink() {
+    if (this.titleBlinkInterval) {
+      clearInterval(this.titleBlinkInterval);
+      this.titleBlinkInterval = null;
+      document.title = this.originalTitle;
     }
   }
 }

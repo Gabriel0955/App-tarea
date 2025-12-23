@@ -831,18 +831,18 @@ p.small {
   .fab-mobile {
     display: flex !important;
     position: fixed;
-    bottom: 20px;
+    bottom: 90px;
     right: 20px;
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     color: white;
-    font-size: 2rem;
+    font-size: 1.8rem;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 20px rgba(0, 212, 255, 0.6);
-    z-index: 999;
+    z-index: 9997;
     border: none;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
