@@ -10,11 +10,11 @@ const crypto = require('crypto');
 
 // PostgreSQL Connection Pool
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+  host: 'apptarea.postgres.database.azure.com',
+  port: 5432,
+  database: 'postgres',
+  user: 'apptarea',
+  password: 'Gabriel1405',
   ssl: {
     rejectUnauthorized: false // Azure PostgreSQL requires SSL
   }
@@ -23,14 +23,14 @@ const pool = new Pool({
 // Test database connection
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
-    console.error('❌ Database connection failed:', err);
+    console.error('[ERROR] Database connection failed:', err);
     process.exit(1);
   }
-  console.log('✅ Database connected:', res.rows[0].now);
+  console.log('[OK] Database connected:', res.rows[0].now);
 });
 
 // WebSocket Server
-const PORT = process.env.WS_PORT || 8080;
+const PORT = 8081; // Cambiado temporalmente para no conflictar con PHP
 const wss = new WebSocket.Server({ 
   port: PORT,
   clientTracking: true 
@@ -39,7 +39,7 @@ const wss = new WebSocket.Server({
 // Active connections Map: userId -> WebSocket
 const connections = new Map();
 
-console.log(`🚀 WebSocket Chat Server running on ws://localhost:${PORT}`);
+console.log(`[SERVER] WebSocket Chat Server running on ws://localhost:${PORT}`);
 
 // Handle new connections
 wss.on('connection', async (ws, req) => {
@@ -47,7 +47,7 @@ wss.on('connection', async (ws, req) => {
   const ip = req.socket.remoteAddress;
   const userAgent = req.headers['user-agent'];
   
-  console.log(`📱 New connection: ${connectionId} from ${ip}`);
+  console.log(`[CONNECT] New connection: ${connectionId} from ${ip}`);
   
   ws.connectionId = connectionId;
   ws.userId = null;
@@ -64,14 +64,14 @@ wss.on('connection', async (ws, req) => {
       const message = JSON.parse(data.toString());
       await handleMessage(ws, message, ip, userAgent);
     } catch (error) {
-      console.error('❌ Error handling message:', error);
+      console.error('[ERROR] Error handling message:', error);
       sendError(ws, 'Invalid message format');
     }
   });
   
   // Handle disconnection
   ws.on('close', async () => {
-    console.log(`📴 Connection closed: ${connectionId}, User: ${ws.userId}`);
+    console.log(`[DISCONNECT] Connection closed: ${connectionId}, User: ${ws.userId}`);
     
     if (ws.userId) {
       connections.delete(ws.userId);
@@ -92,7 +92,7 @@ wss.on('connection', async (ws, req) => {
   });
   
   ws.on('error', (error) => {
-    console.error('❌ WebSocket error:', error);
+    console.error('[ERROR] WebSocket error:', error);
   });
 });
 
@@ -160,7 +160,7 @@ async function handleAuth(ws, payload, ip, userAgent) {
       [userId, ws.connectionId, ip, userAgent]
     );
     
-    console.log(`✅ User authenticated: ${user.username} (${userId})`);
+    console.log(`[AUTH] User authenticated: ${user.username} (${userId})`);
     
     // Send success response
     send(ws, {
@@ -225,7 +225,7 @@ async function handleSendMessage(ws, payload) {
       isRead: false
     };
     
-    console.log(`💬 Message from ${ws.username} to User ${receiverId}`);
+    console.log(`[MESSAGE] From ${ws.username} to User ${receiverId}`);
     
     // Send confirmation to sender
     send(ws, {
@@ -241,9 +241,9 @@ async function handleSendMessage(ws, payload) {
         payload: messageData
       });
       
-      console.log(`✅ Message delivered to User ${receiverId}`);
+      console.log(`[DELIVERED] Message delivered to User ${receiverId}`);
     } else {
-      console.log(`📭 User ${receiverId} is offline, message stored`);
+      console.log(`[OFFLINE] User ${receiverId} is offline, message stored`);
     }
     
   } catch (error) {
@@ -267,7 +267,7 @@ async function handleMarkRead(ws, payload) {
     );
     
     const count = result.rows[0].count;
-    console.log(`✅ Marked ${count} messages as read from User ${senderId}`);
+    console.log(`[READ] Marked ${count} messages as read from User ${senderId}`);
     
     send(ws, {
       type: 'messages_marked_read',
@@ -360,7 +360,7 @@ function sendError(ws, errorMessage) {
 const heartbeatInterval = setInterval(() => {
   wss.clients.forEach((ws) => {
     if (ws.isAlive === false) {
-      console.log(`💀 Terminating dead connection: ${ws.connectionId}`);
+      console.log(`[TERMINATE] Terminating dead connection: ${ws.connectionId}`);
       return ws.terminate();
     }
     
@@ -375,7 +375,7 @@ const cleanupInterval = setInterval(async () => {
     const result = await pool.query('SELECT cleanup_inactive_connections()');
     const count = result.rows[0].cleanup_inactive_connections;
     if (count > 0) {
-      console.log(`🧹 Cleaned up ${count} inactive connections`);
+      console.log(`[CLEANUP] Cleaned up ${count} inactive connections`);
     }
   } catch (error) {
     console.error('Cleanup error:', error);
@@ -384,28 +384,28 @@ const cleanupInterval = setInterval(async () => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('🛑 SIGTERM received, shutting down gracefully...');
+  console.log('[SHUTDOWN] SIGTERM received, shutting down gracefully...');
   clearInterval(heartbeatInterval);
   clearInterval(cleanupInterval);
   
   wss.close(() => {
-    console.log('✅ WebSocket server closed');
+    console.log('[OK] WebSocket server closed');
     pool.end(() => {
-      console.log('✅ Database pool closed');
+      console.log('[OK] Database pool closed');
       process.exit(0);
     });
   });
 });
 
 process.on('SIGINT', () => {
-  console.log('\n🛑 SIGINT received, shutting down gracefully...');
+  console.log('\n[SHUTDOWN] SIGINT received, shutting down gracefully...');
   clearInterval(heartbeatInterval);
   clearInterval(cleanupInterval);
   
   wss.close(() => {
-    console.log('✅ WebSocket server closed');
+    console.log('[OK] WebSocket server closed');
     pool.end(() => {
-      console.log('✅ Database pool closed');
+      console.log('[OK] Database pool closed');
       process.exit(0);
     });
   });

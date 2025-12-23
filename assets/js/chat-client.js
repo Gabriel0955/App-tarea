@@ -86,9 +86,13 @@ connect() {
   // Send message to server
   send(type, payload) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type, payload }));
+      const message = JSON.stringify({ type, payload });
+      console.log(`📤 Sending: ${type}`, payload);
+      this.ws.send(message);
+      return true;
     } else {
-      console.warn('⚠️ WebSocket not connected');
+      console.error('⚠️ WebSocket not connected. ReadyState:', this.ws ? this.ws.readyState : 'null');
+      return false;
     }
   }
 
@@ -146,10 +150,69 @@ connect() {
 
   // Send a chat message
   sendMessage(receiverId, message) {
-    this.send('send_message', {
+    console.log(`💬 Attempting to send message to User ${receiverId}:`, message);
+    
+    if (!this.isConnected) {
+      console.error('❌ Cannot send message: WebSocket not connected');
+      // Intentar fallback HTTP
+      this.sendMessageHTTP(receiverId, message);
+      return false;
+    }
+    
+    const sent = this.send('send_message', {
       receiverId: receiverId,
       message: message
     });
+    
+    if (!sent) {
+      console.error('❌ Message send failed, trying HTTP fallback');
+      this.sendMessageHTTP(receiverId, message);
+    }
+    
+    return sent;
+  }
+  
+  // HTTP fallback for sending messages
+  async sendMessageHTTP(receiverId, message) {
+    try {
+      console.log('🔄 Using HTTP fallback to send message');
+      const response = await fetch('/public/api/chat_api.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          action: 'send_message',
+          receiver_id: receiverId,
+          message: message
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ Message sent via HTTP fallback');
+        // Trigger local message_sent event
+        this.trigger('message_sent', {
+          id: data.message.id,
+          senderId: this.userId,
+          senderUsername: this.username,
+          receiverId: receiverId,
+          message: message,
+          createdAt: data.message.created_at,
+          isRead: false
+        });
+        return true;
+      } else {
+        console.error('❌ HTTP fallback failed:', data.error);
+        alert('Error al enviar mensaje: ' + (data.error || 'Error desconocido'));
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ HTTP fallback error:', error);
+      alert('Error de conexión al enviar mensaje');
+      return false;
+    }
   }
 
   // Mark messages as read

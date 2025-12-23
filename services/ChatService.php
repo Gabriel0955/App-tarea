@@ -109,53 +109,23 @@ class ChatService {
     
     /**
      * Verificar si el usuario puede chatear con otro usuario
-     * (para supervisor: solo con miembros de su equipo)
+     * Ahora todos los usuarios pueden chatear entre sí
      */
     public function canChatWith($userId, $otherUserId) {
-        // Admin puede chatear con todos
+        // Verificar que ambos usuarios existan
         $stmt = $this->pdo->prepare("
-            SELECT r.name FROM users u 
-            JOIN roles r ON u.role_id = r.id 
-            WHERE u.id = ?
-        ");
-        $stmt->execute([$userId]);
-        $role = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($role['name'] === 'admin') {
-            return true;
-        }
-        
-        // Supervisor puede chatear con sus miembros
-        if ($role['name'] === 'supervisor') {
-            $stmt = $this->pdo->prepare("
-                SELECT 1 FROM supervisor_teams 
-                WHERE supervisor_id = ? AND team_member_id = ?
-            ");
-            $stmt->execute([$userId, $otherUserId]);
-            if ($stmt->fetch()) {
-                return true;
-            }
-            
-            // También si el usuario es supervisor del otro
-            $stmt = $this->pdo->prepare("
-                SELECT 1 FROM supervisor_teams 
-                WHERE supervisor_id = ? AND team_member_id = ?
-            ");
-            $stmt->execute([$otherUserId, $userId]);
-            return (bool)$stmt->fetch();
-        }
-        
-        // Usuario normal: puede chatear con su supervisor
-        $stmt = $this->pdo->prepare("
-            SELECT 1 FROM supervisor_teams 
-            WHERE team_member_id = ? AND supervisor_id = ?
+            SELECT COUNT(*) as count FROM users 
+            WHERE id IN (?, ?)
         ");
         $stmt->execute([$userId, $otherUserId]);
-        return (bool)$stmt->fetch();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return $result['count'] == 2;
     }
     
     /**
      * Obtener usuarios disponibles para chatear
+     * Ahora devuelve todos los usuarios excepto el actual
      */
     public function getAvailableChatUsers($userId) {
         $stmt = $this->pdo->prepare("
@@ -167,17 +137,7 @@ class ChatService {
         ");
         
         $stmt->execute([$userId]);
-        $allUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        // Filtrar por permisos
-        $available = [];
-        foreach ($allUsers as $user) {
-            if ($this->canChatWith($userId, $user['id'])) {
-                $available[] = $user;
-            }
-        }
-        
-        return $available;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**

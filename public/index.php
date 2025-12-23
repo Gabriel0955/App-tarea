@@ -783,12 +783,6 @@ function esc($s) {
 <script src="../assets/js/chat-client.js"></script>
 <script src="../assets/js/chat-widget.js"></script>
 <script>
-// Inicializar chat si es supervisor o tiene miembros
-<?php
-require_once __DIR__ . '/../services/ChatService.php';
-$chatService = new ChatService($pdo);
-$availableUsers = $chatService->getAvailableChatUsers($user_id);
-if (!empty($availableUsers)): ?>
 const chatWidget = new ChatWidget({
   userId: <?= $user_id ?>,
   username: '<?= esc($username) ?>',
@@ -796,9 +790,7 @@ const chatWidget = new ChatWidget({
   wsUrl: '<?= ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) ? 'ws://localhost:8080' : 'wss://socket.integra-code.org' ?>'
 });
 
-// Hacer el widget accesible globalmente
 window.chatWidget = chatWidget;
-<?php endif; ?>
 </script>
 
 </body>

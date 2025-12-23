@@ -58,6 +58,7 @@ class ChatWidget {
           </div>
           <div>
             <button id="chatBackBtn" style="display:none">←</button>
+            <button id="chatNewChatBtn" title="Nuevo chat">👥</button>
             <button id="chatMinimizeBtn">−</button>
             <button id="chatCloseBtn">×</button>
           </div>
@@ -115,6 +116,9 @@ class ChatWidget {
   attachEventListeners() {
     document.getElementById('chatToggleBtn')?.addEventListener('click', () => {
       document.getElementById('chatWidget').classList.toggle('hidden');
+      if (!document.getElementById('chatWidget').classList.contains('hidden')) {
+        this.loadConversations();
+      }
     });
 
     document.getElementById('chatMinimizeBtn')?.addEventListener('click', () => {
@@ -123,6 +127,16 @@ class ChatWidget {
 
     document.getElementById('chatCloseBtn')?.addEventListener('click', () => {
       document.getElementById('chatWidget').classList.add('hidden');
+    });
+    
+    document.getElementById('chatNewChatBtn')?.addEventListener('click', () => {
+      this.showUsersList();
+    });
+    
+    document.getElementById('chatBackBtn')?.addEventListener('click', () => {
+      this.loadConversations();
+      document.getElementById('chatBackBtn').style.display = 'none';
+      document.getElementById('chatFooter').style.display = 'none';
     });
 
     const sendBtn = document.getElementById('chatSendBtn');
@@ -133,11 +147,9 @@ class ChatWidget {
     });
 
     input?.addEventListener('input', (e) => {
-      // Habilitar/deshabilitar botón según haya texto
       const hasText = e.target.value.trim().length > 0;
       sendBtn.disabled = !hasText;
       
-      // Auto-resize del textarea
       e.target.style.height = 'auto';
       e.target.style.height = e.target.scrollHeight + 'px';
     });
@@ -155,17 +167,84 @@ class ChatWidget {
     const data = await res.json();
 
     const body = document.getElementById('chatBody');
+    const headerTitle = document.getElementById('chatHeaderTitle');
+    const headerSubtitle = document.getElementById('chatHeaderSubtitle');
+    const backBtn = document.getElementById('chatBackBtn');
+    
     body.innerHTML = '';
+    headerTitle.textContent = 'Conversaciones';
+    headerSubtitle.textContent = 'Selecciona una conversación';
+    backBtn.style.display = 'none';
 
     if (!data.success || data.conversations.length === 0) {
-      body.innerHTML = '<p>No hay conversaciones</p>';
+      body.innerHTML = `
+        <div class="chat-empty-state">
+          <div class="chat-empty-state-icon">💬</div>
+          <p class="chat-empty-state-text">No tienes conversaciones aún</p>
+          <button onclick="window.chatWidget.showUsersList()" style="margin-top: 12px; padding: 8px 16px; border-radius: 20px; border: none; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; cursor: pointer;">Iniciar chat</button>
+        </div>
+      `;
       return;
     }
 
     data.conversations.forEach(conv => {
       const el = document.createElement('div');
-      el.textContent = conv.other_username;
+      el.className = 'chat-conversation-item';
+      el.innerHTML = `
+        <div class="chat-conversation-avatar">
+          ${conv.other_username.charAt(0).toUpperCase()}
+        </div>
+        <div class="chat-conversation-info">
+          <div class="chat-conversation-name">${this.escapeHtml(conv.other_username)}</div>
+          <div class="chat-conversation-preview">${this.escapeHtml(conv.last_message || 'Sin mensajes')}</div>
+        </div>
+        <div class="chat-conversation-meta">
+          ${conv.last_message_at ? this.formatTime(conv.last_message_at) : ''}
+          ${conv.unread_count > 0 ? `<div class="chat-conversation-unread">${conv.unread_count}</div>` : ''}
+        </div>
+      `;
       el.onclick = () => this.openChat(conv);
+      body.appendChild(el);
+    });
+  }
+  
+  async showUsersList() {
+    const res = await fetch('/public/api/chat_api.php?action=get_available_users');
+    const data = await res.json();
+
+    const body = document.getElementById('chatBody');
+    const headerTitle = document.getElementById('chatHeaderTitle');
+    const headerSubtitle = document.getElementById('chatHeaderSubtitle');
+    const backBtn = document.getElementById('chatBackBtn');
+    
+    body.innerHTML = '';
+    headerTitle.textContent = 'Nuevo chat';
+    headerSubtitle.textContent = 'Selecciona un usuario';
+    backBtn.style.display = 'block';
+
+    if (!data.success || data.users.length === 0) {
+      body.innerHTML = `
+        <div class="chat-empty-state">
+          <div class="chat-empty-state-icon">👥</div>
+          <p class="chat-empty-state-text">No hay usuarios disponibles</p>
+        </div>
+      `;
+      return;
+    }
+
+    data.users.forEach(user => {
+      const el = document.createElement('div');
+      el.className = 'chat-conversation-item';
+      el.innerHTML = `
+        <div class="chat-conversation-avatar">
+          ${user.username.charAt(0).toUpperCase()}
+        </div>
+        <div class="chat-conversation-info">
+          <div class="chat-conversation-name">${this.escapeHtml(user.username)}</div>
+          <div class="chat-conversation-preview">${this.escapeHtml(user.role || 'Usuario')}</div>
+        </div>
+      `;
+      el.onclick = () => this.openChat(user);
       body.appendChild(el);
     });
   }
@@ -173,13 +252,14 @@ class ChatWidget {
   async openChat(user) {
     this.currentChatUser = user;
     
-    // Normalizar el objeto usuario (puede venir de diferentes fuentes)
     const userId = user.other_user_id || user.id;
     const username = user.other_username || user.username;
     const isOnline = user.isOnline !== undefined ? user.isOnline : false;
 
     document.getElementById('chatFooter').style.display = 'block';
     document.getElementById('chatHeaderTitle').textContent = username;
+    document.getElementById('chatHeaderSubtitle').textContent = isOnline ? 'En línea' : 'Desconectado';
+    document.getElementById('chatBackBtn').style.display = 'block';
 
     try {
       const res = await fetch(`/public/api/chat_api.php?action=get_messages&user_id=${userId}`);
